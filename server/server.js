@@ -1,13 +1,18 @@
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import userRoutes from "./routes/user.route.js";
-
+import cors from "cors";
+import router from "./routes/user.route.js";
 dotenv.config();
 const app = express();
+app.use(cors(
+  {
+    origin: 'http://localhost:5173', // frontend Vite
+    credentials: true
+  }
+));
 app.use(express.json());
-
-app.use("/api/users", userRoutes);
+app.use("/api/users", router);
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {

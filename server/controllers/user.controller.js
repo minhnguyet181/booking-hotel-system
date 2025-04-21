@@ -1,10 +1,19 @@
-import * as userService from "../services/user.service.js";
-
-export const register = async (req, res) => {
+import User from '../models/User.js';
+export const createUser = async (req, res) => {
   try {
-    const user = await userService.registerUser(req.body);
+    const user = new User(req.body);
+    await user.save();
     res.status(201).json(user);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find();
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };
