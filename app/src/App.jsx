@@ -6,17 +6,22 @@ import React from 'react';
 function App() {
   const [message, setMessage] = useState('');
 
-  axios.get('http://localhost:5000/api/users')
-  .then(res => setMessage(res.data.message))
-  .catch(err => {
-    console.error("❌ Lỗi FE gọi API:", err);
-    setMessage('Kết nối thất bại!');
-    showNotification({
-      title: 'Lỗi',
-      message: err.message || 'Không rõ lỗi',
-      color: 'red',
-    });
-  });
+  useEffect(() => {
+    axios.get('http://localhost:5000/api/users')
+      .then(res => {
+        console.log("✅ Dữ liệu từ backend:", res.data);
+        setMessage(res.data.message); // giả sử backend trả về { message: '...' }
+      })
+      .catch(err => {
+        console.error("❌ Lỗi FE gọi API:", err);
+        setMessage('Kết nối thất bại!');
+        showNotification({
+          title: 'Lỗi',
+          message: err.message || 'Không rõ lỗi',
+          color: 'red',
+        });
+      });
+  }, []);
 
 
   return (
