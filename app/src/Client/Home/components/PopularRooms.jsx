@@ -1,0 +1,179 @@
+import React from 'react';
+import { Title, Text, Card, Group, Grid, Badge, Image, Button, Box, Container } from '@mantine/core';
+
+function PopularRooms({ rooms, loading, error }) {
+  // Hiển thị rating dưới dạng sao
+  const renderRating = (rating) => {
+    const stars = [];
+    for (let i = 0; i < 5; i++) {
+      stars.push(
+        <span key={i} style={{ color: '#f59f00' }}>
+          {i < Math.floor(rating) ? '★' : '☆'}
+        </span>
+      );
+    }
+    return stars;
+  };
+
+  // Format giá tiền
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+  };
+
+  // Dữ liệu mẫu nếu không có dữ liệu từ API
+  const sampleRooms = [
+    {
+      _id: '1',
+      roomName: 'Phòng Deluxe Hướng Biển',
+      rating: 4,
+      price: 1800000,
+      capacity: 2,
+      roomType: 'Deluxe',
+      images: ['room1.jpg'],
+    },
+    {
+      _id: '2',
+      roomName: 'Phòng Suite Gia Đình',
+      rating: 4,
+      price: 2500000,
+      capacity: 4,
+      roomType: 'Suite',
+      images: ['room2.jpg'],
+    },
+    {
+      _id: '3',
+      roomName: 'Phòng Standard Đơn',
+      rating: 4,
+      price: 800000,
+      capacity: 1,
+      roomType: 'Standard',
+      images: ['room3.jpg'],
+    },
+    {
+      _id: '4',
+      roomName: 'Phòng Superior Đôi',
+      rating: 5,
+      price: 1200000,
+      capacity: 2,
+      roomType: 'Superior',
+      images: ['room4.jpg'],
+    },
+    {
+      _id: '5',
+      roomName: 'Phòng Executive Hướng Vườn',
+      rating: 5,
+      price: 2200000,
+      capacity: 2,
+      roomType: 'Executive',
+      images: ['room5.jpg'],
+    },
+    {
+      _id: '6',
+      roomName: 'Phòng Honeymoon Suite',
+      rating: 5,
+      price: 3000000,
+      capacity: 2,
+      roomType: 'Suite',
+      images: ['room6.jpg'],
+    }
+  ];
+
+  // Sử dụng dữ liệu mẫu nếu không có dữ liệu từ API
+  const displayRooms = (rooms && rooms.length > 0) ? rooms.slice(0, 6) : sampleRooms;
+
+  return (
+    <Container size="xl" sx={{ marginTop: '80px', marginBottom: '80px' }}>
+      <Title sx={{
+        fontSize: '36px',
+        fontWeight: 700,
+        textAlign: 'center',
+        marginBottom: '60px',
+        fontFamily: 'Playfair Display, serif',
+      }}>Our Most Popular Rooms</Title>
+
+      {loading ? (
+        <Text align="center">Đang tải dữ liệu phòng...</Text>
+      ) : error ? (
+        <Text align="center" color="red">{error}</Text>
+      ) : (
+        <Grid>
+          {displayRooms.map((room) => (
+            <Grid.Col key={room._id} span={4} style={{ marginBottom: '30px' }}>
+              <Card sx={{
+                transition: 'transform 0.2s',
+                '&:hover': {
+                  transform: 'translateY(-5px)',
+                },
+                padding: 0,
+                overflow: 'hidden',
+              }} shadow="sm" radius="md" withBorder>
+                <Card.Section>
+                  <Box style={{ position: 'relative' }}>
+                    <Badge sx={{
+                      position: 'absolute',
+                      top: '15px',
+                      right: '15px',
+                      backgroundColor: '#f59f00',
+                      color: '#212529',
+                      fontWeight: 700,
+                      padding: '5px 10px',
+                      borderRadius: '4px',
+                      zIndex: 2,
+                      fontSize: '16px',
+                    }}>
+                      {formatPrice(room.price)}
+                    </Badge>
+                    <Image
+                      src={`/images/rooms/${room.images && room.images.length > 0 ? room.images[0] : 'default.jpg'}`}
+                      height={220}
+                      alt={room.roomName}
+                    />
+                  </Box>
+                </Card.Section>
+
+                <Box sx={{ padding: '20px' }}>
+                  <Title sx={{
+                    fontSize: '22px',
+                    fontWeight: 700,
+                    marginTop: '5px',
+                    marginBottom: '5px',
+                    fontFamily: 'Playfair Display, serif',
+                  }}>{room.roomName}</Title>
+                  
+                  <Group>{renderRating(room.rating)}</Group>
+                  
+                  <Group sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    color: '#868e96',
+                    marginTop: '10px',
+                    marginBottom: '5px',
+                  }}>
+                    <Text>🕒 7 days 6 nights</Text>
+                  </Group>
+
+                  <Button
+                    sx={{
+                      backgroundColor: '#f59f00',
+                      color: '#212529',
+                      '&:hover': {
+                        backgroundColor: '#fab005',
+                      },
+                      marginTop: '15px',
+                    }}
+                    fullWidth
+                    radius="md"
+                  >
+                    LEARN MORE
+                  </Button>
+                </Box>
+              </Card>
+            </Grid.Col>
+          ))}
+        </Grid>
+      )}
+    </Container>
+  );
+}
+
+export default PopularRooms;
