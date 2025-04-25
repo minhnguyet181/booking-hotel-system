@@ -1,60 +1,56 @@
 import * as userService from '../services/userService.js';
-import jwt from 'jsonwebtoken';
-const generateToken = (user) => {
-  return jwt.sign(
-    { id: user._id, role: user.role },
-    process.env.JWT_SECRET,
-    { expiresIn: '1d' }
-  );
-};
 
 export const registerUser = async (req, res) => {
   try {
-    const user = await userService.registerUser(req.body);
-    const token = generateToken(user);
-    res.status(201).json({ user, token });
-  } catch (err) {
-    res.status(400).json({ error: err.message });
+    const newUser  = await userService.registerUser(req.body);
+    res.status(201).json({ message: 'Đăng ký thành công', user: newUser  });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
   }
 };
 
-export const loginUser= async (req, res) => {
+export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await userService.loginUser(email, password);
-    const token = generateToken(user);
-    res.json({ user, token });
-  } catch (err) {
-    res.status(401).json({ error: err.message });
+    const { user, accessToken } = await userService.loginUser(email, password);
+    res.status(200).json({ message: 'Đăng nhập thành công', user, accessToken });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
   }
 };
+
+export const updateUser = async (req, res) => {
+  try {
+    const user = await userService.updateUser(req.params.id, req.body);
+    res.status(200).json({ message: 'Cập nhật thành công', user });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+export const deleteUser = async (req, res) => {
+  try {
+    await userService.deleteUser(req.params.id);
+    res.status(200).json({ message: 'Xóa người dùng thành công' });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+export const findById = async (req, res) => {
+  try {
+    const user = await userService.findById(req.params.id);
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
 export const getAllUsers = async (req, res) => {
   try {
-    const users = await userService.getAllUsers();
-    res.json(users);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
-export const updateUser = async (req, res, next) => {
-  const { id } = req.params;
-  const updateData = req.body;
-
-  try {
-    const updatedUser = await userService.updateUser(id, updateData);
-    res.status(200).json(updatedUser);
-  } catch (err) {
-    next(err);
-  }
-};
-
-export const deleteUser= async (req, res, next) => {
-  const { id } = req.params;
-
-  try {
-    await userService.deleteUser(id);
-    res.status(200).json("User has been deleted successfully...");
-  } catch (err) {
-    next(err);
+    const users = await userService.findAll();
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
   }
 };

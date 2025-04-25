@@ -1,7 +1,13 @@
-import User from "../models/User.js";
+import User from '../models/User.js';
+import bcrypt from 'bcryptjs';
 
-export const createUser = async (userData) => {
-  return await User.create(userData);
+export const registerUser  = async (userData) => {
+  const existingUser  = await User.findOne({ email: userData.email });
+  if (existingUser ) {
+    throw new Error('Email đã tồn tại');
+  }
+  const newUser  = new User(userData);
+  return await newUser .save();
 };
 
 export const findUserByEmail = async (email) => {
@@ -11,13 +17,34 @@ export const findUserByEmail = async (email) => {
 export const findUserById = async (id) => {
   return await User.findById(id);
 };
+
+export const updateUser  = async (id, updates) => {
+  const user = await User.findByIdAndUpdate(id, updates, { new: true });
+  if (!user) {
+    throw new Error('Người dùng không tồn tại');
+  }
+  return user;
+};
+
+export const deleteUser  = async (id) => {
+  const user = await User.findByIdAndDelete(id);
+  if (!user) {
+    throw new Error('Người dùng không tồn tại');
+  }
+};
+
 export const getAllUsers = async () => {
   return await User.find();
 };
-export const updateUserById = async (id, updateData) => {
-  return await User.findByIdAndUpdate(id, updateData, { new: true });
-};
 
-export const deleteUserById = async (id) => {
-  return await User.findByIdAndDelete(id);
+export const loginUser  = async (email, password) => {
+  const user = await findUserByEmail(email);
+  if (!user) {
+    throw new Error('Email không tồn tại');
+  }
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) {
+    throw new Error('Mật khẩu không đúng');
+  }
+  return user;
 };
