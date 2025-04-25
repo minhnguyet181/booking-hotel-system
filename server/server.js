@@ -6,6 +6,7 @@ import cors from "cors";
 import userRouter from "./routes/user.route.js";
 import hotelRouter from "./routes/hotel.route.js";
 import roomRouter from "./routes/room.route.js";
+import activityRouter from "./routes/activity.route.js";
 dotenv.config();
 const app = express();
 app.use(cors(
@@ -18,6 +19,7 @@ app.use(express.json());
 app.use("/users", userRouter);
 app.use("/hotel",hotelRouter);
 app.use("/rooms",roomRouter);
+app.use("/activities", activityRouter);
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
