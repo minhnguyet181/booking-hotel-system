@@ -1,16 +1,38 @@
 import React from 'react';
 import { Title, Text, Card, Group, Grid, Badge, Image, Button, Box, Container } from '@mantine/core';
+import { useNavigate } from 'react-router-dom';
 
 function PopularRooms({ rooms, loading, error }) {
+  const navigate = useNavigate();
+
   // Hiển thị rating dưới dạng sao
   const renderRating = (rating) => {
     const stars = [];
+    const fullStars = rating < 4.5 ? 4 : 4.5;
+    
     for (let i = 0; i < 5; i++) {
-      stars.push(
-        <span key={i} style={{ color: '#f59f00' }}>
-          {i < Math.floor(rating) ? '★' : '☆'}
-        </span>
-      );
+      if (i < Math.floor(fullStars)) {
+        // Sao đầy đủ
+        stars.push(
+          <span key={i} style={{ color: '#f59f00' }}>
+            ★
+          </span>
+        );
+      } else if (i === Math.floor(fullStars) && fullStars % 1 !== 0) {
+        // Nửa sao (chỉ áp dụng cho 4.5 sao)
+        stars.push(
+          <span key={i} style={{ color: '#f59f00' }}>
+            ★
+          </span>
+        );
+      } else {
+        // Sao rỗng
+        stars.push(
+          <span key={i} style={{ color: '#f59f00' }}>
+            ☆
+          </span>
+        );
+      }
     }
     return stars;
   };
@@ -18,6 +40,13 @@ function PopularRooms({ rooms, loading, error }) {
   // Format giá tiền
   const formatPrice = (price) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+  };
+
+  // Hàm xử lý chuyển hướng khi nhấn nút "Xem thêm"
+  const handleViewMore = (roomType) => {
+    // Chuyển đổi tên phòng thành slug URL
+    const roomTypeSlug = roomType.toLowerCase().replace(/ /g, '-');
+    navigate(`/rooms/category/${roomTypeSlug}`);
   };
 
   // Dữ liệu mẫu nếu không có dữ liệu từ API
@@ -88,8 +117,8 @@ function PopularRooms({ rooms, loading, error }) {
         fontWeight: 700,
         textAlign: 'center',
         marginBottom: '60px',
-        fontFamily: 'Playfair Display, serif',
-      }}>Our Most Popular Rooms</Title>
+        fontFamily: 'Arial, sans-serif',
+      }}>Các phòng nổi bật của chúng tôi</Title>
 
       {loading ? (
         <Text align="center">Đang tải dữ liệu phòng...</Text>
@@ -120,6 +149,7 @@ function PopularRooms({ rooms, loading, error }) {
                       borderRadius: '4px',
                       zIndex: 2,
                       fontSize: '16px',
+                      fontFamily: 'Roboto, sans-serif',
                     }}>
                       {formatPrice(room.price)}
                     </Badge>
@@ -137,7 +167,7 @@ function PopularRooms({ rooms, loading, error }) {
                     fontWeight: 700,
                     marginTop: '5px',
                     marginBottom: '5px',
-                    fontFamily: 'Playfair Display, serif',
+                    fontFamily: 'Roboto, sans-serif',
                   }}>{room.roomName}</Title>
                   
                   <Group>{renderRating(room.rating)}</Group>
@@ -148,11 +178,13 @@ function PopularRooms({ rooms, loading, error }) {
                     color: '#868e96',
                     marginTop: '10px',
                     marginBottom: '5px',
+                    fontFamily: 'Roboto, sans-serif',
                   }}>
-                    <Text>🕒 7 days 6 nights</Text>
+                    <Text style={{ fontFamily: 'Roboto, sans-serif' }}>🕒 Tối đa {room.capacity} người - 30m²</Text>
                   </Group>
 
                   <Button
+                    onClick={() => handleViewMore(room.roomType)}
                     sx={{
                       backgroundColor: '#f59f00',
                       color: '#212529',
@@ -160,11 +192,13 @@ function PopularRooms({ rooms, loading, error }) {
                         backgroundColor: '#fab005',
                       },
                       marginTop: '15px',
+                      fontFamily: 'Roboto, sans-serif',
+                      fontWeight: 500,
                     }}
                     fullWidth
                     radius="md"
                   >
-                    LEARN MORE
+                    XEM THÊM
                   </Button>
                 </Box>
               </Card>

@@ -21,13 +21,13 @@ function Navbar() {
             <Group>
               <Text size="xs">
                 <span style={{ marginRight: '5px' }}>📧</span>
-                DROP US A EMAIL: Hresort@mail.com
+                GỬI EMAIL CHO CHÚNG TÔI: Hresort@mail.com
               </Text>
             </Group>
             <Group>
               <Text size="xs">
                 <span style={{ marginRight: '5px' }}>📞</span>
-                ANY QUESTIONS? CALL US: +84 879684732 / +84 093485930
+                CÓ THẮC MẮC? GỌI NGAY: +84 879684732 / +84 093485930
               </Text>
             </Group>
           </Group>
@@ -58,21 +58,21 @@ function Navbar() {
                 whiteSpace: 'nowrap',
                 color: 'white',
                 '&:hover': { color: '#f59f00' }
-              }}>HOME</Text>
+              }}>TRANG CHỦ</Text>
               <Text size="xs" sx={{ 
                 fontWeight: 500, 
                 cursor: 'pointer',
                 whiteSpace: 'nowrap',
                 color: 'white',
                 '&:hover': { color: '#f59f00' }
-              }}>ACTIVITIES</Text>
+              }}>HOẠT ĐỘNG</Text>
               <Text size="xs" sx={{ 
                 fontWeight: 500, 
                 cursor: 'pointer',
                 whiteSpace: 'nowrap',
                 color: 'white',
                 '&:hover': { color: '#f59f00' }
-              }}>DESTINATIONS</Text>
+              }}>ĐIỂM ĐẾN</Text>
             </Group>
 
             {/* Logo ở giữa */}
@@ -109,21 +109,21 @@ function Navbar() {
                 whiteSpace: 'nowrap',
                 color: 'white',
                 '&:hover': { color: '#f59f00' }
-              }}>PAGES</Text>
+              }}>TRANG</Text>
               <Text size="xs" sx={{ 
                 fontWeight: 500, 
                 cursor: 'pointer',
                 whiteSpace: 'nowrap',
                 color: 'white',
                 '&:hover': { color: '#f59f00' }
-              }}>ABOUT</Text>
+              }}>GIỚI THIỆU</Text>
               <Text size="xs" sx={{ 
                 fontWeight: 500, 
                 cursor: 'pointer',
                 whiteSpace: 'nowrap',
                 color: 'white',
                 '&:hover': { color: '#f59f00' }
-              }}>CONTACT</Text>
+              }}>LIÊN HỆ</Text>
               <Button size="xs" variant="filled" sx={{ 
                 backgroundColor: '#f59f00',
                 padding: '0 10px',

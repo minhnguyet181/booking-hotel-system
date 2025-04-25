@@ -53,7 +53,7 @@ const roomSchema = new mongoose.Schema({
   roomType: {
     type: String,
     required: true,
-    enum: ['Standard', 'Deluxe', 'Suite', 'Family', 'VIP'],
+    enum: ['Tiêu chuẩn', 'Deluxe', 'Suite', 'Gia đình', 'VIP'],
   },
   bedType: {
     type: String,

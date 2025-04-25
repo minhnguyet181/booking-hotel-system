@@ -140,14 +140,14 @@ function Banner() {
           color: 'white',
           textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)',
           fontFamily: 'Playfair Display, serif',
-        }}>Enjoy A Luxury</Title>
+        }}>Tận Hưởng Trải Nghiệm</Title>
         <Title sx={{
           fontSize: '60px',
           marginBottom: '60px',
           color: 'white',
           textShadow: '1px 1px 2px rgba(0, 0, 0, 0.5)',
           fontFamily: 'Playfair Display, serif',
-        }}>Experience</Title>
+        }}>Sang Trọng</Title>
         
         {/* Nút BOOK NOW mới */}
         <Box
@@ -167,7 +167,7 @@ function Banner() {
             },
           }}
         >
-          BOOK NOW
+          ĐẶT NGAY
         </Box>
       </Container>
     </Box>
