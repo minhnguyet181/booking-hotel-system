@@ -14,3 +14,10 @@ export const findUserById = async (id) => {
 export const getAllUsers = async () => {
   return await User.find();
 };
+export const updateUserById = async (id, updateData) => {
+  return await User.findByIdAndUpdate(id, updateData, { new: true });
+};
+
+export const deleteUserById = async (id) => {
+  return await User.findByIdAndDelete(id);
+};

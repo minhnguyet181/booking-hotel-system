@@ -18,3 +18,10 @@ export const loginUser = async (email, password) => {
 export const getAllUsers = async () => {
   return await userRepository.getAllUsers();
 };
+export const updateUser = async (id, updateData) => {
+  return await userRepository.updateUserById(id, updateData);
+};
+
+export const deleteUser = async (id) => {
+  return await userRepository.deleteUserById(id);
+};
