@@ -8,7 +8,7 @@ import {
   Button,
   Notification,
 } from '@mantine/core';
-import api from '../../axios';
+import api from '../../../axios';
 import { useNavigate } from 'react-router-dom';
 
 function LoginPage() {

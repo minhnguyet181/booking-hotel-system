@@ -54,3 +54,11 @@ export const getAllUsers = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
+export const logoutUser = async (req, res) => {
+  try {
+    const message = await userService.logoutUser();
+    res.status(200).json({ success: true, message });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};

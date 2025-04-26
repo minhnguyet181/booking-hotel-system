@@ -30,3 +30,6 @@ export const findById = async (id) => {
 export const findAll = async () => {
   return await userRepository.getAllUsers();
 };
+export const logoutUser =async() => {
+  return await userRepository.logoutUser();
+}
