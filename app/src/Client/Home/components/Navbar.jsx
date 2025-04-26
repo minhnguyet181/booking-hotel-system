@@ -2,9 +2,9 @@ import React from 'react';
 import { Box, Container, Group, Text, Title, Button } from '@mantine/core';
 // Xóa import FaSearch nếu bạn không sử dụng nó đúng cách
 // import { FaSearch } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
-
+import { useNavigate } from 'react-router-dom';
 function Navbar() {
+  const navigate = useNavigate();
   return (
     <Box sx={{ 
       position: 'relative',
@@ -53,33 +53,30 @@ function Navbar() {
               alignItems: 'center',
               flexWrap: 'nowrap'
             }}>
-              <Link to="/" style={{ textDecoration: 'none' }}>
-                <Text size="xs" sx={{ 
-                  fontWeight: 500, 
-                  cursor: 'pointer',
-                  whiteSpace: 'nowrap',
-                  color: 'white',
-                  '&:hover': { color: '#f59f00' }
-                }}>TRANG CHỦ</Text>
-              </Link>
-              <Link to="/activities" style={{ textDecoration: 'none' }}>
-                <Text size="xs" sx={{ 
-                  fontWeight: 500, 
-                  cursor: 'pointer',
-                  whiteSpace: 'nowrap',
-                  color: 'white',
-                  '&:hover': { color: '#f59f00' }
-                }}>HOẠT ĐỘNG</Text>
-              </Link>
-              <Link to="/destinations" style={{ textDecoration: 'none' }}>
-                <Text size="xs" sx={{ 
-                  fontWeight: 500, 
-                  cursor: 'pointer',
-                  whiteSpace: 'nowrap',
-                  color: 'white',
-                  '&:hover': { color: '#f59f00' }
-                }}>ĐIỂM ĐẾN</Text>
-              </Link>
+              <Button onClick={() => navigate('/users')} >
+                Đăng nhập
+              </Button>
+              <Text size="xs" sx={{ 
+                fontWeight: 500, 
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                color: 'white',
+                '&:hover': { color: '#f59f00' }
+              }}>TRANG CHỦ</Text>
+              <Text size="xs" sx={{ 
+                fontWeight: 500, 
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                color: 'white',
+                '&:hover': { color: '#f59f00' }
+              }}>HOẠT ĐỘNG</Text>
+              <Text size="xs" sx={{ 
+                fontWeight: 500, 
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                color: 'white',
+                '&:hover': { color: '#f59f00' }
+              }}>ĐIỂM ĐẾN</Text>
             </Group>
 
             {/* Logo ở giữa */}
