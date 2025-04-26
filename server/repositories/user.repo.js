@@ -18,12 +18,12 @@ export const findUserById = async (id) => {
   return await User.findById(id);
 };
 
-export const updateUser  = async (id, updates) => {
-  const user = await User.findByIdAndUpdate(id, updates, { new: true });
-  if (!user) {
-    throw new Error('Người dùng không tồn tại');
-  }
-  return user;
+export const updateUserByGmail = async (gmail, updates) => {
+  return await User.findOneAndUpdate(
+    { gmail: gmail },   // điều kiện tìm user
+    updates,            // các field cần update
+    { new: true }       // trả về document mới sau update
+  );
 };
 
 export const deleteUser  = async (id) => {

@@ -11,9 +11,10 @@ export const loginUser = async (email, password) => {
   return { user, accessToken };
 };
 
-export const updateUser = async (id, updates) => {
-  return await userRepository.updateUser (id, updates);
+export const updateUser = async (gmail, updates) => {
+  return await userRepository.updateUserByGmail(gmail, updates);
 };
+
 
 export const deleteUser = async (id) => {
   return await userRepository.deleteUser (id);

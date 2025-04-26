@@ -10,7 +10,7 @@ function Navbar() {
 
   const handleLogout = () => {
     localStorage.removeItem('token'); // Xóa token
-    navigate('/login'); // Điều hướng về login
+    navigate('/'); 
   };
 
   return (
