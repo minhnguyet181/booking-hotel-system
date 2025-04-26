@@ -18,9 +18,9 @@ export const findUserById = async (id) => {
   return await User.findById(id);
 };
 
-export const updateUserByGmail = async (gmail, updates) => {
+export const updateUserByGmail = async (email, updates) => {
   return await User.findOneAndUpdate(
-    { gmail: gmail },   // điều kiện tìm user
+    { email: email },   // điều kiện tìm user
     updates,            // các field cần update
     { new: true }       // trả về document mới sau update
   );
