@@ -7,6 +7,7 @@ import {
   PasswordInput,
   Button,
   Notification,
+  Box
 } from '@mantine/core';
 import api from '../../../axios';
 import { useNavigate } from 'react-router-dom';
@@ -15,7 +16,7 @@ function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
-  const navigate = useNavigate(); // ✅ dùng hook navigate
+  const navigate = useNavigate();
 
   const handleLogin = async () => {
     setError(null);
@@ -33,9 +34,14 @@ function LoginPage() {
     }
   };
 
+  // Thêm hàm xử lý điều hướng về trang chủ
+  const handleBackToHome = () => {
+    navigate('/');
+  };
+
   return (
-    <Container size="xs" my={40}>
-      <Paper withBorder shadow="md" p={30} radius="md">
+    <Container size={420} my={40}>
+      <Paper withBorder shadow="md" p={30} mt={30} radius="md">
         <Title order={2} align="center" mb="md">Đăng nhập</Title>
 
         {error && (
@@ -64,6 +70,18 @@ function LoginPage() {
         <Button fullWidth mt="xl" onClick={handleLogin}>
           Đăng nhập
         </Button>
+        
+        {/* Thêm nút trở về trang chủ */}
+        <Box mt="md">
+          <Button 
+            fullWidth 
+            variant="outline" 
+            color="gray" 
+            onClick={handleBackToHome}
+          >
+            Trở về trang chủ
+          </Button>
+        </Box>
       </Paper>
     </Container>
   );

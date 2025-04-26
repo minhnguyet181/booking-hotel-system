@@ -103,6 +103,11 @@ function RoomCategoryPage() {
       }, 1000);
   }, [roomTypeSlug]);
 
+  // Hàm xử lý chuyển hướng đến trang chi tiết phòng
+  const handleViewDetail = (roomId) => {
+    navigate(`/rooms/${roomId}`);
+  };
+
   return (
     <div style={{ 
       fontFamily: 'Arial, sans-serif',
@@ -172,6 +177,9 @@ function RoomCategoryPage() {
                   },
                   padding: 0,
                   overflow: 'hidden',
+                  height: '100%', // Đảm bảo tất cả card có chiều cao 100%
+                  display: 'flex',
+                  flexDirection: 'column', // Sắp xếp nội dung theo chiều dọc
                 }} shadow="sm" radius="md" withBorder>
                   <Card.Section>
                     <Box style={{ position: 'relative' }}>
@@ -198,7 +206,12 @@ function RoomCategoryPage() {
                     </Box>
                   </Card.Section>
 
-                  <Box sx={{ padding: '20px' }}>
+                  <Box sx={{ 
+                    padding: '20px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    flexGrow: 1, // Cho phép box này mở rộng để lấp đầy không gian còn lại
+                  }}>
                     <Title sx={{
                       fontSize: '22px',
                       fontWeight: 700,
@@ -215,6 +228,13 @@ function RoomCategoryPage() {
                       marginTop: '10px',
                       marginBottom: '10px',
                       fontFamily: 'Roboto, sans-serif',
+                      flexGrow: 1, // Cho phép phần mô tả mở rộng
+                      height: '80px', // Cố định chiều cao cho phần mô tả
+                      overflow: 'hidden', // Ẩn nội dung vượt quá
+                      textOverflow: 'ellipsis', // Hiển thị dấu ... khi nội dung bị cắt
+                      display: '-webkit-box',
+                      WebkitLineClamp: 4, // Giới hạn số dòng hiển thị
+                      WebkitBoxOrient: 'vertical',
                     }}>
                       {room.description}
                     </Text>
@@ -227,25 +247,26 @@ function RoomCategoryPage() {
                       marginBottom: '5px',
                       fontFamily: 'Roboto, sans-serif',
                     }}>
-                      <Text style={{ fontFamily: 'Roboto, sans-serif' }}>🕒 Tối đa {room.capacity} người - 30m²</Text>
+                      <Text style={{ fontFamily: 'Roboto, sans-serif' }}>🕒 Tối đa {room.capacity} người - {room.area}m²</Text>
                     </Group>
 
-                    <Button
-                      sx={{
-                        backgroundColor: '#f59f00',
-                        color: '#212529',
-                        '&:hover': {
-                          backgroundColor: '#fab005',
-                        },
-                        marginTop: '15px',
-                        fontFamily: 'Roboto, sans-serif',
-                        fontWeight: 500,
-                      }}
-                      fullWidth
-                      radius="md"
-                    >
-                      ĐẶT PHÒNG NGAY
-                    </Button>
+                    <Group position="center" mt="auto" spacing="sm"> {/* Thêm mt="auto" để đẩy các nút xuống dưới cùng */}
+                      <Button 
+                        variant="outline" 
+                        color="blue" 
+                        onClick={() => navigate(`/rooms/${room._id}`)}
+                        fullWidth
+                      >
+                        Chi tiết
+                      </Button>
+                      <Button 
+                        color="orange" 
+                        onClick={() => navigate(`/booking/${room._id}`)}
+                        fullWidth
+                      >
+                        ĐẶT PHÒNG NGAY
+                      </Button>
+                    </Group>
                   </Box>
                 </Card>
               </Grid.Col>

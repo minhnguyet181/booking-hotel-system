@@ -1,5 +1,5 @@
 import * as bookingRepository from '../repositories/booking.repo.js';
-import * as notificationRepository from '../repositories/notification.repo.js'; // Thêm dòng này
+import * as notificationRepository from '../repositories/notification.repo.js';
 
 export const createBooking = async (userId, bookingData) => {
   bookingData.user = userId;
@@ -12,4 +12,16 @@ export const createBooking = async (userId, bookingData) => {
   await notificationRepository.createNotification(userId, message);
 
   return booking;
+};
+
+export const createNotification = async (userId, message) => {
+  return await notificationRepository.createNotification(userId, message);
+};
+
+export const getNotificationsByUserId = async (userId) => {
+  return await notificationRepository.getNotificationsByUserId(userId);
+};
+
+export const markNotificationAsRead = async (notificationId) => {
+  return await notificationRepository.markNotificationAsRead(notificationId);
 };
