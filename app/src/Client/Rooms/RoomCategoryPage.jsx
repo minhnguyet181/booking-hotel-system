@@ -17,12 +17,12 @@ function RoomCategoryPage() {
     const typeMap = {
       'deluxe': 'Deluxe',
       'suite': 'Suite',
-      'standard': 'Standard',
+      'standard': 'Tiêu chuẩn',
       'superior': 'Superior',
       'executive': 'Executive',
       'honeymoon-suite': 'Honeymoon Suite',
       'vip': 'VIP',
-      'family': 'Family'
+      'family': 'Gia đình'
     };
     return typeMap[slug] || 'Không xác định';
   };
@@ -76,175 +76,37 @@ function RoomCategoryPage() {
     // Gọi API để lấy dữ liệu phòng theo loại
     setLoading(true);
     
-    // Trong thực tế, bạn sẽ gọi API với tham số roomType
-    // api.get(`/rooms?roomType=${getRoomTypeFromSlug(roomTypeSlug)}`)
+    // Lấy roomType từ slug
+    const roomType = getRoomTypeFromSlug(roomTypeSlug);
     
-    // Tạm thời sử dụng dữ liệu mẫu
-    setTimeout(() => {
-      const sampleRoomsByType = {
-        'deluxe': [
-          {
-            _id: '101',
-            roomName: 'Phòng Deluxe Hướng Biển',
-            rating: 4,
-            price: 1800000,
-            capacity: 2,
-            roomType: 'Deluxe',
-            images: ['room1.jpg'],
-            description: 'Phòng sang trọng với view biển tuyệt đẹp'
-          },
-          {
-            _id: '102',
-            roomName: 'Phòng Deluxe Hướng Vườn',
-            rating: 4.2,
-            price: 1600000,
-            capacity: 2,
-            roomType: 'Deluxe',
-            images: ['room1.jpg'],
-            description: 'Phòng sang trọng với view vườn yên tĩnh'
-          },
-          {
-            _id: '103',
-            roomName: 'Phòng Deluxe Góc',
-            rating: 4.7,
-            price: 2000000,
-            capacity: 2,
-            roomType: 'Deluxe',
-            images: ['room1.jpg'],
-            description: 'Phòng góc rộng rãi với tầm nhìn panorama'
-          }
-        ],
-        'suite': [
-          {
-            _id: '201',
-            roomName: 'Phòng Suite Gia Đình',
-            rating: 4,
-            price: 2500000,
-            capacity: 4,
-            roomType: 'Suite',
-            images: ['room2.jpg'],
-            description: 'Phòng rộng rãi dành cho gia đình'
-          },
-          {
-            _id: '202',
-            roomName: 'Phòng Honeymoon Suite',
-            rating: 5,
-            price: 3000000,
-            capacity: 2,
-            roomType: 'Suite',
-            images: ['room6.jpg'],
-            description: 'Phòng lãng mạn dành cho cặp đôi'
-          },
-          {
-            _id: '203',
-            roomName: 'Phòng Executive Suite',
-            rating: 4.8,
-            price: 3500000,
-            capacity: 2,
-            roomType: 'Suite',
-            images: ['room2.jpg'],
-            description: 'Phòng sang trọng với không gian làm việc'
-          }
-        ],
-        'standard': [
-          {
-            _id: '301',
-            roomName: 'Phòng Standard Đơn',
-            rating: 4,
-            price: 800000,
-            capacity: 1,
-            roomType: 'Standard',
-            images: ['room3.jpg'],
-            description: 'Phòng tiêu chuẩn dành cho 1 người'
-          },
-          {
-            _id: '302',
-            roomName: 'Phòng Standard Đôi',
-            rating: 4.1,
-            price: 1000000,
-            capacity: 2,
-            roomType: 'Standard',
-            images: ['room3.jpg'],
-            description: 'Phòng tiêu chuẩn dành cho 2 người'
-          }
-        ],
-        'superior': [
-          {
-            _id: '401',
-            roomName: 'Phòng Superior Đôi',
-            rating: 5,
-            price: 1200000,
-            capacity: 2,
-            roomType: 'Superior',
-            images: ['room4.jpg'],
-            description: 'Phòng cao cấp với giường đôi'
-          },
-          {
-            _id: '402',
-            roomName: 'Phòng Superior Twin',
-            rating: 4.5,
-            price: 1200000,
-            capacity: 2,
-            roomType: 'Superior',
-            images: ['room4.jpg'],
-            description: 'Phòng cao cấp với 2 giường đơn'
-          }
-        ],
-        'executive': [
-          {
-            _id: '501',
-            roomName: 'Phòng Executive Hướng Vườn',
-            rating: 5,
-            price: 2200000,
-            capacity: 2,
-            roomType: 'Executive',
-            images: ['room5.jpg'],
-            description: 'Phòng hạng sang với view vườn'
-          },
-          {
-            _id: '502',
-            roomName: 'Phòng Executive Hướng Biển',
-            rating: 5,
-            price: 2500000,
-            capacity: 2,
-            roomType: 'Executive',
-            images: ['room5.jpg'],
-            description: 'Phòng hạng sang với view biển'
-          }
-        ],
-        'vip': [
-          {
-            _id: '601',
-            roomName: 'Phòng VIP Penthouse',
-            rating: 5,
-            price: 5000000,
-            capacity: 2,
-            roomType: 'VIP',
-            images: ['room4.jpg'],
-            description: 'Phòng penthouse sang trọng trên tầng cao nhất'
-          }
-        ],
-        'family': [
-          {
-            _id: '701',
-            roomName: 'Phòng Family Kết Nối',
-            rating: 4.5,
-            price: 3000000,
-            capacity: 4,
-            roomType: 'Family',
-            images: ['room6.jpg'],
-            description: 'Hai phòng kết nối dành cho gia đình'
-          }
-        ]
-      };
+    // Gọi API với tham số roomType
+    api.get(`/rooms/filter`, { params: { roomType } })
+      .then(res => {
+        if (res.data && res.data.success) {
+          setRooms(res.data.data || []);
+        } else {
+          setError('Không thể lấy dữ liệu phòng');
+        }
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("❌ Lỗi khi lấy dữ liệu phòng:", err);
+        
+        // Sử dụng dữ liệu mẫu khi không kết nối được API
+        
 
-      const roomType = roomTypeSlug.toLowerCase();
-      const roomsData = sampleRoomsByType[roomType] || [];
-      
-      setRooms(roomsData);
-      setLoading(false);
-    }, 1000);
+        const roomType = roomTypeSlug.toLowerCase();
+        const roomsData = sampleRoomsByType[roomType] || [];
+        
+        setRooms(roomsData);
+        setLoading(false);
+      }, 1000);
   }, [roomTypeSlug]);
+
+  // Hàm xử lý chuyển hướng đến trang chi tiết phòng
+  const handleViewDetail = (roomId) => {
+    navigate(`/rooms/${roomId}`);
+  };
 
   return (
     <div style={{ 
@@ -315,6 +177,9 @@ function RoomCategoryPage() {
                   },
                   padding: 0,
                   overflow: 'hidden',
+                  height: '100%', // Đảm bảo tất cả card có chiều cao 100%
+                  display: 'flex',
+                  flexDirection: 'column', // Sắp xếp nội dung theo chiều dọc
                 }} shadow="sm" radius="md" withBorder>
                   <Card.Section>
                     <Box style={{ position: 'relative' }}>
@@ -341,7 +206,12 @@ function RoomCategoryPage() {
                     </Box>
                   </Card.Section>
 
-                  <Box sx={{ padding: '20px' }}>
+                  <Box sx={{ 
+                    padding: '20px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    flexGrow: 1, // Cho phép box này mở rộng để lấp đầy không gian còn lại
+                  }}>
                     <Title sx={{
                       fontSize: '22px',
                       fontWeight: 700,
@@ -358,6 +228,13 @@ function RoomCategoryPage() {
                       marginTop: '10px',
                       marginBottom: '10px',
                       fontFamily: 'Roboto, sans-serif',
+                      flexGrow: 1, // Cho phép phần mô tả mở rộng
+                      height: '80px', // Cố định chiều cao cho phần mô tả
+                      overflow: 'hidden', // Ẩn nội dung vượt quá
+                      textOverflow: 'ellipsis', // Hiển thị dấu ... khi nội dung bị cắt
+                      display: '-webkit-box',
+                      WebkitLineClamp: 4, // Giới hạn số dòng hiển thị
+                      WebkitBoxOrient: 'vertical',
                     }}>
                       {room.description}
                     </Text>
@@ -370,25 +247,26 @@ function RoomCategoryPage() {
                       marginBottom: '5px',
                       fontFamily: 'Roboto, sans-serif',
                     }}>
-                      <Text style={{ fontFamily: 'Roboto, sans-serif' }}>🕒 Tối đa {room.capacity} người - 30m²</Text>
+                      <Text style={{ fontFamily: 'Roboto, sans-serif' }}>🕒 Tối đa {room.capacity} người - {room.area}m²</Text>
                     </Group>
 
-                    <Button
-                      sx={{
-                        backgroundColor: '#f59f00',
-                        color: '#212529',
-                        '&:hover': {
-                          backgroundColor: '#fab005',
-                        },
-                        marginTop: '15px',
-                        fontFamily: 'Roboto, sans-serif',
-                        fontWeight: 500,
-                      }}
-                      fullWidth
-                      radius="md"
-                    >
-                      ĐẶT PHÒNG NGAY
-                    </Button>
+                    <Group position="center" mt="auto" spacing="sm"> {/* Thêm mt="auto" để đẩy các nút xuống dưới cùng */}
+                      <Button 
+                        variant="outline" 
+                        color="blue" 
+                        onClick={() => navigate(`/rooms/${room._id}`)}
+                        fullWidth
+                      >
+                        Chi tiết
+                      </Button>
+                      <Button 
+                        color="orange" 
+                        onClick={() => navigate(`/booking/${room._id}`)}
+                        fullWidth
+                      >
+                        ĐẶT PHÒNG NGAY
+                      </Button>
+                    </Group>
                   </Box>
                 </Card>
               </Grid.Col>

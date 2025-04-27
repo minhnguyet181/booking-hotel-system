@@ -2,8 +2,12 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
-import userRoutes from "./routes/user.route.js";
-import roomRoutes from "./routes/room.route.js";
+import bookingRouter from "./routes/booking.route.js";
+import userRouter from "./routes/user.route.js";
+import hotelRouter from "./routes/hotel.route.js";
+import roomRouter from "./routes/room.route.js";
+import activityRouter from "./routes/activity.route.js";
+import notiRouter from "./routes/notification.route.js";
 dotenv.config();
 const app = express();
 app.use(cors(
@@ -13,10 +17,12 @@ app.use(cors(
   }
 ));
 app.use(express.json());
-// Đăng ký routes
-app.use("/api/users", userRoutes);
-app.use("/api/rooms", roomRoutes);
-
+app.use("/users", userRouter);
+app.use("/hotel",hotelRouter);
+app.use("/rooms",roomRouter);
+app.use("/activities", activityRouter);
+app.use("/booking", bookingRouter);
+app.use("/notifications",notiRouter);
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log("✅ MongoDB connected");

@@ -45,7 +45,32 @@ function PopularRooms({ rooms, loading, error }) {
   // Hàm xử lý chuyển hướng khi nhấn nút "Xem thêm"
   const handleViewMore = (roomType) => {
     // Chuyển đổi tên phòng thành slug URL
-    const roomTypeSlug = roomType.toLowerCase().replace(/ /g, '-');
+    let roomTypeSlug;
+    
+    // Đảm bảo chuyển đổi đúng định dạng theo mô hình Room.js
+    switch(roomType) {
+      case 'Deluxe':
+        roomTypeSlug = 'deluxe';
+        break;
+      case 'Suite':
+        roomTypeSlug = 'suite';
+        break;
+      case 'Tiêu chuẩn':
+      case 'Standard':
+        roomTypeSlug = 'standard';
+        break;
+      case 'VIP':
+        roomTypeSlug = 'vip';
+        break;
+      case 'Gia đình':
+      case 'Family':
+        roomTypeSlug = 'family';
+        break;
+      default:
+        roomTypeSlug = roomType.toLowerCase().replace(/ /g, '-');
+    }
+    
+    // Chuyển hướng đến trang loại phòng với slug tương ứng
     navigate(`/rooms/category/${roomTypeSlug}`);
   };
 
@@ -108,7 +133,13 @@ function PopularRooms({ rooms, loading, error }) {
   ];
 
   // Sử dụng dữ liệu mẫu nếu không có dữ liệu từ API
-  const displayRooms = (rooms && rooms.length > 0) ? rooms.slice(0, 6) : sampleRooms;
+  const displayRooms = (rooms && rooms.length > 0) ? [
+    ...(rooms.length >= 1 ? [rooms[0]] : []),
+    ...(rooms.length >= 2 ? [rooms[1]] : []),
+    ...(rooms.length >= 3 ? [rooms[2]] : []),
+    ...(rooms.length >= 13 ? [rooms[12]] : []),
+    ...(rooms.length >= 18 ? [rooms[17]] : [])
+  ] : sampleRooms;
 
   return (
     <Container size="xl" sx={{ marginTop: '80px', marginBottom: '80px' }}>
