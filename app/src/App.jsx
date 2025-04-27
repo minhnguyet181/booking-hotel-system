@@ -13,6 +13,7 @@ import RoomDetailPage from "./Client/Rooms/RoomDetailPage";
 import BookingPage from "./Client/Booking/BookingPage";
 import NotificationsPage from "./Client/Notifications/NotificationsPage";
 import UserManagePage from "./Client/User/UserManagePage";
+import RegisterPage from './Client/Home/Login/RegisterPage';
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
         <Route path='/admin/rooms' element={<ManageRooms/>}  />
         <Route path="/notifications" element={<NotificationsPage />} />
         <Route path="/userManage" element={<UserManagePage />} />
+        <Route path="/register" element={<RegisterPage />} />
 
         {/* Thêm các route khác ở đây */}
       </Routes>
