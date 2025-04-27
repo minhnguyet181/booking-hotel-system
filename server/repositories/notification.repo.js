@@ -1,7 +1,12 @@
 import Notification from '../models/Notification.js';
 
 export const createNotification = async (userId, message) => {
-  const notification = new Notification({ user: userId, message });
+  const notification = new Notification({
+    user: userId,
+    message,
+    isRead: false
+  });
+  
   return await notification.save();
 };
 
@@ -10,5 +15,9 @@ export const getNotificationsByUserId = async (userId) => {
 };
 
 export const markNotificationAsRead = async (notificationId) => {
-  return await Notification.findByIdAndUpdate(notificationId, { isRead: true }, { new: true });
+  return await Notification.findByIdAndUpdate(
+    notificationId,
+    { isRead: true },
+    { new: true }
+  );
 };

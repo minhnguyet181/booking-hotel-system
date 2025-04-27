@@ -4,7 +4,7 @@ import { getMyNotifications, markAsRead } from '../controllers/notificationContr
 
 const notiRouter = express.Router();
 
-notiRouter.get('/', verifyTokenMiddleware, getMyNotifications);
+notiRouter.get('/my-notifications', verifyTokenMiddleware, getMyNotifications);
 notiRouter.put('/:id/read', verifyTokenMiddleware, markAsRead);
 
 export default notiRouter;
