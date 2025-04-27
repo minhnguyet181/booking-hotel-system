@@ -13,11 +13,20 @@ export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
     const { user, accessToken } = await userService.loginUser(email, password);
-    res.status(201).json({ success: true, message: "Đăng ký thành công", data: newUser });
+
+    res.status(200).json({
+      success: true,
+      message: "Đăng nhập thành công",
+      data: {
+        user,
+        accessToken,
+      },
+    });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(400).json({ success: false, message: error.message });
   }
 };
+
 
 
 // Admin cập nhật user khác

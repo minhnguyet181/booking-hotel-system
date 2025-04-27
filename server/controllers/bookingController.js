@@ -2,10 +2,14 @@ import * as bookingService from '../services/bookingService.js';
 
 export const createBooking = async (req, res) => {
   try {
-    const booking = await bookingService.createBooking(req.user._id,req.body);
-    res.status(201).json({ success: true, data: booking });
+    const userId = req.user._id; // ✅ Lấy user từ token
+    const bookingData = req.body; // ✅ Lấy dữ liệu từ body request
+
+    const booking = await bookingService.createBooking(userId, bookingData); // ✅ Gọi service
+    res.status(201).json({ success: true, data: booking }); // ✅ Trả về booking thành công
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
+    console.error("❌ Error in createBooking:", error);
+    res.status(400).json({ success: false, message: error.message }); // ✅ Trả lỗi chi tiết
   }
 };
 

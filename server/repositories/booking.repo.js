@@ -1,8 +1,8 @@
 import Booking from '../models/Booking.js';
 
 export const createBooking = async (bookingData) => {
-  const booking = new Booking(bookingData);
-  return await booking.save();
+  const booking = await Booking.create(bookingData);
+  return booking;
 };
 
 export const findBookingsByUserId = async (userId) => {

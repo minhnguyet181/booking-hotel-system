@@ -4,7 +4,7 @@ import * as notiService from './notiService.js';
 export const createBooking = async (userId, bookingData) => {
   bookingData.user = userId;
   bookingData.status = 'pending';
-  
+  console.log('✅ bookingData gửi vào bookingRepository:', bookingData);
   const booking = await bookingRepository.createBooking(bookingData);
   const message = `Đặt phòng của bạn đã được ghi nhận. Hãy đợi nhân viên xác nhận thông tin đặt phòng.`;
   await notiService.createNotification(userId, message);

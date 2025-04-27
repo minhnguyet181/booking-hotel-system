@@ -22,23 +22,24 @@ function LoginPage() {
     setError(null);
     try {
       const res = await api.post('users/login', { email, password });
-
-      // Lưu thông tin người dùng và token
-      localStorage.setItem('token', res.data.accessToken);
-      localStorage.setItem('user', JSON.stringify(res.data.user));
-      // ✅ Điều hướng sau khi đăng nhập thành công
-        // Kiểm tra role
-        const role = res.data.user.role;
-
-        if (role === 'admin') {
-          navigate('/admin'); // Nếu là admin thì vào trang admin
-        } else {
-          navigate('/'); // Nếu là user thì về trang chủ
-        }
+  
+      const { user, accessToken } = res.data.data; // ✅ lấy từ data
+  
+      // Lưu token và user
+      localStorage.setItem('token', accessToken);
+      localStorage.setItem('user', JSON.stringify(user));
+  
+      const role = user.role;
+      if (role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
     } catch (err) {
-      setError(err.response?.data?.error || 'Đăng nhập thất bại');
+      setError(err.response?.data?.message || 'Đăng nhập thất bại'); // ✅ lấy từ message
     }
   };
+  
 
   // Thêm hàm xử lý điều hướng về trang chủ
   const handleBackToHome = () => {

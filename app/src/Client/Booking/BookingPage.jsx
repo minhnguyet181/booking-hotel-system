@@ -28,7 +28,8 @@ function BookingPage() {
     children: 0,
     specialRequests: '',
     paymentMethod: 'Thanh toán tại khách sạn khi check-in',
-    agreeToTerms: false
+    agreeToTerms: false,
+    numberOfGuests:1,
   });
 
   // Format giá tiền
@@ -67,9 +68,11 @@ function BookingPage() {
   };
 
   // Xử lý submit form
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
+    // các phần await api.post(...) phía dưới
+  
+  
     
     if (!formData.agreeToTerms) {
       showNotification({
@@ -93,43 +96,32 @@ function BookingPage() {
     // Chuẩn bị dữ liệu để gửi đi
     const bookingData = {
       ...formData,
-      roomId: roomId,
+      room: roomId,
       totalPrice: calculateTotalPrice(),
       totalDays: calculateTotalDays(),
-      status: 'pending'
+      numberOfGuests: formData.adults + formData.children,
+      status: 'pending', 
+      user: formData.fullName
     };
-    
-    // Gửi dữ liệu đặt phòng đến API
-    api.post('/booking', bookingData)
-      .then(res => {
-        if (res.data && res.data.success) {
-          showNotification({
-            title: 'Thành công',
-            message: 'Hãy đợi nhân viên xác nhận thông tin đặt phòng',
-            color: 'green',
-          });
-          
-          // Chuyển hướng về trang chủ
-          navigate('/');
-        } else {
-          showNotification({
-            title: 'Lỗi',
-            message: res.data.message || 'Đã xảy ra lỗi khi đặt phòng.',
-            color: 'red',
-          });
-        }
-      })
-      .catch(err => {
-        console.error("❌ Lỗi khi đặt phòng:", err);
-        
-        // Hiển thị thông báo thành công giả lập (vì chưa có API thực)
-        showNotification({
-          title: 'Thành công',
-          message: 'Hãy đợi nhân viên xác nhận thông tin đặt phòng',
-          color: 'green',
-        });
-        
-      });
+    const token = localStorage.getItem('accessToken');
+
+    try {
+      const res = await api.post('/booking', bookingData,
+        {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+      if (res.data && res.data.success) {
+        showNotification({ title: 'Thành công', message: 'Đặt phòng thành công! Vui lòng chờ xác nhận.', color: 'green' });
+        navigate('/');
+      } else {
+        throw new Error(res.data.message || 'Đặt phòng thất bại.');
+      }
+    } catch (err) {
+      console.error('❌ Lỗi đặt phòng:', err);
+      showNotification({ title: 'Lỗi', message: err.response?.data?.message || 'Lỗi khi đặt phòng.', color: 'red' });
+    }
   };
 
   useEffect(() => {
