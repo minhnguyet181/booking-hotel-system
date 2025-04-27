@@ -23,11 +23,17 @@ function LoginPage() {
       const res = await api.post('users/login', { email, password });
 
       // Lưu thông tin người dùng và token
-      localStorage.setItem('token', res.data.token);
+      localStorage.setItem('token', res.data.accessToken);
       localStorage.setItem('user', JSON.stringify(res.data.user));
-
       // ✅ Điều hướng sau khi đăng nhập thành công
-      navigate('/');
+        // Kiểm tra role
+        const role = res.data.user.role;
+
+        if (role === 'admin') {
+          navigate('/admin'); // Nếu là admin thì vào trang admin
+        } else {
+          navigate('/'); // Nếu là user thì về trang chủ
+        }
     } catch (err) {
       setError(err.response?.data?.error || 'Đăng nhập thất bại');
     }

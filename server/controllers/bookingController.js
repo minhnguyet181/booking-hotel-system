@@ -19,10 +19,17 @@ export const getUserBookings = async (req, res) => {
 };
 export const getAllBookings = async (req, res) => {
   try {
-    const bookings = await bookingService.getAllBookings();
-    res.status(200).json({ success: true, data: bookings });
+    const bookings = await bookingService.getAllBookings(); // 👈 lấy từ service
+    res.status(200).json({
+      success: true,
+      bookings, // 👈 TRẢ bookings ở đây
+    });
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
+    console.error('Error fetching bookings:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi server',
+    });
   }
 };
 

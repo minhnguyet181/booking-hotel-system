@@ -7,7 +7,7 @@ export const registerUser = async (userData) => {
 
 export const loginUser = async (email, password) => {
   const user = await userRepository.loginUser (email, password);
-  const accessToken = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+  const accessToken = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '6h' });
   return { user, accessToken };
 };
 
@@ -34,3 +34,18 @@ export const findAll = async () => {
 export const logoutUser =async() => {
   return await userRepository.logoutUser();
 }
+export const updateUserByAdmin = async (id, updates) => {
+  const user = await userRepository.findUserById(id);
+  if (!user) {
+    throw new Error('Người dùng không tồn tại');
+  }
+
+  // Cập nhật thông tin người dùng
+  user.email = updates.email || user.email;
+  user.phone = updates.phone || user.phone;
+  user.address = updates.address || user.address;
+
+  // Lưu lại thay đổi
+  await user.save();
+  return user;
+};
