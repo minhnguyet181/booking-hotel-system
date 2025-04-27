@@ -10,7 +10,7 @@ userRouter.post('/login', loginUser);
 userRouter.put('/profile', verifyTokenMiddleware, updateUser);
 
 // Admin lấy danh sách, update user khác, xóa user
-userRouter.get('/', getAllUsers);
+userRouter.get('/', verifyTokenMiddleware, checkRoleMiddleware('admin'), getAllUsers);
 userRouter.put('/:id',verifyTokenMiddleware,checkRoleMiddleware('admin'), updateUserByAdmin);
 userRouter.delete('/:id', verifyTokenMiddleware, checkRoleMiddleware('admin'), deleteUser);
 

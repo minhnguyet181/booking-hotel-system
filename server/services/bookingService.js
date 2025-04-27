@@ -6,8 +6,6 @@ export const createBooking = async (userId, bookingData) => {
   bookingData.status = 'pending';
   
   const booking = await bookingRepository.createBooking(bookingData);
-
-  // Tạo thông báo sau khi đặt phòng thành công
   const message = `Đặt phòng của bạn đã được ghi nhận. Hãy đợi nhân viên xác nhận thông tin đặt phòng.`;
   await notiService.createNotification(userId, message);
 
@@ -28,22 +26,24 @@ export const getPendingBookings = async () => {
 
 export const updateBookingStatus = async (id, status) => {
   const booking = await bookingRepository.updateBookingStatus(id, status);
-  
+
   if (!booking) {
     throw new Error('Không tìm thấy booking');
   }
-  
-  // Gửi thông báo cho người dùng khi trạng thái đặt phòng thay đổi
-  let message = '';
-  if (status === 'confirmed') {
-    message = 'Đặt phòng của bạn đã được xác nhận thành công.';
-  } else if (status === 'cancelled') {
-    message = 'Đặt phòng của bạn đã bị từ chối.';
-  }
-  
-  if (message && booking.user) {
+
+  // Gửi notification sau khi cập nhật thành công
+  if (booking.user) {
+    let message = '';
+    if (status === 'confirmed') {
+      message = 'Đặt phòng của bạn đã được xác nhận thành công!';
+    } else if (status === 'canceled') {
+      message = 'Đặt phòng của bạn đã bị từ chối!';
+    } else {
+      message = `Trạng thái đặt phòng của bạn đã thay đổi thành ${status}`;
+    }
+
     await notiService.createNotification(booking.user, message);
   }
-  
+
   return booking;
 };

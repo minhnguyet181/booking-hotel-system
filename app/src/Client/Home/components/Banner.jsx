@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Title, Button, Container } from '@mantine/core';
-
+import { useNavigate } from "react-router-dom";
 function Banner() {
   // Mảng chứa các ảnh banner
   const bannerImages = [
@@ -8,7 +8,7 @@ function Banner() {
     'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=1920',
     'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=1920'
   ];
-
+   const navigate = useNavigate();
   // State để theo dõi ảnh hiện tại
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -166,8 +166,10 @@ function Banner() {
               backgroundColor: '#fab005',
             },
           }}
+          onClick={() => navigate('/booking')} 
         >
-          ĐẶT NGAY
+               ĐẶT NGAY    
+
         </Box>
       </Container>
     </Box>

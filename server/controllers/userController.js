@@ -13,7 +13,7 @@ export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
     const { user, accessToken } = await userService.loginUser(email, password);
-    res.status(200).json({ message: 'Đăng nhập thành công', user, accessToken });
+    res.status(201).json({ success: true, message: "Đăng ký thành công", data: newUser });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }

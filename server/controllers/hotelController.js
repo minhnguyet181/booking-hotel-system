@@ -3,7 +3,11 @@ import * as hotelService from '../services/hotelService.js';
 export const getHotelInfoController = async (req, res, next) => {
   try {
     const hotel = await hotelService.getHotelInfo();
-    res.status(200).json(hotel);
+    res.status(200).json({
+      success: true,
+      data: hotel,
+    });
+    
   } catch (error) {
     next(error);
   }

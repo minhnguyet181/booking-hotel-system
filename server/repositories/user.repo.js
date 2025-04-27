@@ -49,5 +49,5 @@ export const loginUser  = async (email, password) => {
   return user;
 };
 export const logoutUser = async () => {
-  return { message: 'Người dùng đã đăng xuất thành công' };
+  return { success: true, message: 'Người dùng đã đăng xuất thành công' };
 };

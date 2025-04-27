@@ -2,10 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   Container, Title, Text, Grid, Card, Group, TextInput, 
-  Button, Box, Loader, Divider, Select, Textarea, Checkbox,
-  NumberInput, Image
+  Button, Box, Loader, Divider, Select, Textarea, Checkbox, Image
 } from '@mantine/core';
-import { DatePicker, TimeInput } from '@mantine/dates';
 import { showNotification } from '@mantine/notifications';
 import Navbar from '../Home/components/Navbar';
 import Footer from '../Home/components/Footer';
@@ -102,7 +100,7 @@ function BookingPage() {
     };
     
     // Gửi dữ liệu đặt phòng đến API
-    api.post('/bookings', bookingData)
+    api.post('/booking', bookingData)
       .then(res => {
         if (res.data && res.data.success) {
           showNotification({
@@ -131,8 +129,6 @@ function BookingPage() {
           color: 'green',
         });
         
-        // Chuyển hướng về trang chủ
-        navigate('/');
       });
   };
 
