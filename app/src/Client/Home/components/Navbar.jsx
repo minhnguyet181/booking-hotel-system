@@ -137,18 +137,12 @@ function Navbar() {
 
             {/* Nhóm bên phải */}
             <Group spacing="xs" sx={{ display: 'flex', alignItems: 'center', flexWrap: 'nowrap' }}>
-              <Text size="m" sx={{ fontWeight: 500, cursor: 'pointer', whiteSpace: 'nowrap', color: 'white', '&:hover': { color: '#f59f00' } }}>
-                BLOG
-              </Text>
-              <Text size="m" sx={{ fontWeight: 500, cursor: 'pointer', whiteSpace: 'nowrap', color: 'white', '&:hover': { color: '#f59f00' } }}>
-                TRANG
-              </Text>
+              
+              
               <Text size="m" sx={{ fontWeight: 500, cursor: 'pointer', whiteSpace: 'nowrap', color: 'white', '&:hover': { color: '#f59f00' } }}>
                 GIỚI THIỆU
               </Text>
-              <Text size="m" sx={{ fontWeight: 500, cursor: 'pointer', whiteSpace: 'nowrap', color: 'white', '&:hover': { color: '#f59f00' } }}>
-                LIÊN HỆ
-              </Text>
+              
               
             </Group>
           </Group>

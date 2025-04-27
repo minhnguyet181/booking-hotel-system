@@ -42,14 +42,7 @@ function Footer() {
               fontWeight: 700,
               marginBottom: '20px',
             }}>Liên kết</Title>
-            <Text sx={{
-              display: 'block',
-              color: '#adb5bd',
-              marginBottom: '5px',
-              '&:hover': {
-                color: '#ffe066',
-              },
-            }}>Trang chủ</Text>
+            
             <Text sx={{
               display: 'block',
               color: '#adb5bd',
@@ -66,30 +59,10 @@ function Footer() {
                 color: '#ffe066',
               },
             }}>Phòng</Text>
-            <Text sx={{
-              display: 'block',
-              color: '#adb5bd',
-              marginBottom: '5px',
-              '&:hover': {
-                color: '#ffe066',
-              },
-            }}>Ưu đãi</Text>
-            <Text sx={{
-              display: 'block',
-              color: '#adb5bd',
-              marginBottom: '5px',
-              '&:hover': {
-                color: '#ffe066',
-              },
-            }}>Giới thiệu</Text>
-            <Text sx={{
-              display: 'block',
-              color: '#adb5bd',
-              marginBottom: '5px',
-              '&:hover': {
-                color: '#ffe066',
-              },
-            }}>Liên hệ</Text>
+            
+            
+           
+            
           </Grid.Col>
           <Grid.Col span={3}>
             <Title sx={{
