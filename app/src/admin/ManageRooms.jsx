@@ -1,197 +1,188 @@
-import React, { useEffect, useState } from "react";
-import { Card, Text, Button, Input, Group, Grid, Loader, Title, Image, Skeleton, Badge } from "@mantine/core";
-import { useNavigate } from "react-router-dom";
-import api from "../axios";
-
-const ManageRooms = () => {
+import React, { useEffect, useState } from 'react';
+import { Container, Title, Text, Grid, Card, Group, Badge, Image, Box, Loader, Button, Modal } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import api from '../axios';
+import { useNavigate } from 'react-router-dom';
+import {AiOutlineRollback} from 'react-icons/ai';
+function ManageRooms() {
   const [rooms, setRooms] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [search, setSearch] = useState("");
-  const navigate = useNavigate();
-
+  const [loading, setLoading] = useState(true);
+  const [deleteRoomId, setDeleteRoomId] = useState(null);
+  const [confirmOpened, { open, close }] = useDisclosure(false);
+  const navigate =useNavigate();
   useEffect(() => {
     fetchRooms();
   }, []);
 
-  const fetchRooms = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const res = await api.get("/rooms");
-      setRooms(res.data.data || []);
-      console.log("Rooms:", res.data.data);
-
-      
-      // Handle different response formats
-      // if (res.data && res.data.success && Array.isArray(res.data.data)) {
-      //   setRooms(res.data.data);
-      // } else if (Array.isArray(res.data)) {
-      //   setRooms(res.data);
-      // } else if (res.data && Array.isArray(res.data.rooms)) {
-      //   // Another possible format
-      //   setRooms(res.data.rooms);
-      // } else {
-      //   setError("Invalid data format received from server");
-      //   setRooms([]);
-      // }
-    } catch (error) {
-      console.error("Failed to fetch rooms:", error);
-      setError(error.response?.data?.message || error.message || "Failed to fetch rooms");
-      setRooms([]);
-    } finally {
-      setLoading(false);
-    }
+  const fetchRooms = () => {
+    setLoading(true);
+    api.get('/rooms')
+      .then(res => {
+        if (res.data && res.data.success) {
+          setRooms(res.data.data || []);
+        } else {
+          console.error('❌ Không thể lấy danh sách phòng');
+        }
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('❌ Lỗi lấy phòng:', err);
+        setLoading(false);
+      });
   };
 
-  const handleDelete = async (roomId) => {
-    if (!window.confirm("Are you sure you want to delete this room?")) return;
-    try {
-      await api.delete(`/rooms/${roomId}`);
-      setRooms((prev) => prev.filter((room) => room._id !== roomId));
-    } catch (error) {
-      console.error("Failed to delete room:", error);
-      alert(error.response?.data?.message || error.message || "Failed to delete room");
-    }
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
   };
 
-  const handleSearch = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const res = await api.get(`/rooms/filter?search=${encodeURIComponent(search)}`);
-
-      if (res.data && res.data.success && Array.isArray(res.data.data)) {
-        setRooms(res.data.data);
-      } else if (Array.isArray(res.data)) {
-        setRooms(res.data);
-      } else if (res.data && Array.isArray(res.data.rooms)) {
-        setRooms(res.data.rooms);
-      } else {
-        setError("Invalid search results format received from server");
-        setRooms([]);
-      }
-    } catch (error) {
-      console.error("Search failed:", error);
-      setError(error.response?.data?.message || error.message || "Search failed");
-      setRooms([]);
-    } finally {
-      setLoading(false);
-      console.log(loading);
-    }
+  const handleUpdate = (roomId) => {
+    alert(`👉 Chuyển đến trang cập nhật phòng với ID: ${roomId}`);
   };
 
+  const handleDeleteConfirm = (roomId) => {
+    setDeleteRoomId(roomId);
+    open(); // Mở modal xác nhận
+  };
 
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
+  const handleDelete = () => {
+    if (!deleteRoomId) return;
+
+    api.delete(`/rooms/${deleteRoomId}`)
+      .then(res => {
+        if (res.data && res.data.success) {
+          // Xóa thành công, load lại danh sách
+          fetchRooms();
+        } else {
+          console.error('❌ Không thể xóa phòng');
+        }
+      })
+      .catch(err => {
+        console.error('❌ Lỗi xóa phòng:', err);
+      })
+      .finally(() => {
+        setDeleteRoomId(null);
+        close();
+      });
   };
 
   return (
-    <div style={{ padding: "24px" }}>
-      <Group position="apart" mb="md">
-        <Title order={2}>Manage Rooms</Title>
-        <Button onClick={() => navigate("/rooms/create")}>Create New Room</Button>
-      </Group>
-
-      <Group mb="lg">
-        <Input
-          placeholder="Search rooms..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          onKeyPress={handleKeyPress}
-          style={{ flex: 1, maxWidth: 400 }}
-        />
-        <Button onClick={handleSearch}>Search</Button>
-      </Group>
-
-      {error && (
-        <Text color="red" mb="md">
-          Error: {error}
-        </Text>
-      )}
-
+    <Container size="xl" style={{ marginTop: '80px', marginBottom: '80px' }}>
+      <Title align="center" style={{ fontSize: '36px', fontWeight: 700, marginBottom: '40px' }}>
+        Quản lý danh sách phòng
+      </Title>
+      <Button
+            variant="outline"
+            color="gray"
+            onClick={() => navigate("/admin")}
+            leftIcon={<AiOutlineRollback size={20} />}
+      >
+        Quay về trang Admin
+      </Button>
       {loading ? (
-        <Grid>
-          {[...Array(6)].map((_, index) => (
-            <Grid.Col key={index} span={{ base: 12, sm: 6, md: 4 }}>
-              <Skeleton height={300} />
-            </Grid.Col>
-          ))}  
-        </Grid>
-      ) : rooms && rooms.length > 0 ? (
+        <Box style={{ display: 'flex', justifyContent: 'center', padding: '50px 0' }}>
+          <Loader size="xl" color="#f59f00" />
+        </Box>
+      ) : (
         <Grid>
           {rooms.map((room) => (
-            <Grid.Col key={room._id} span={{ base: 12, sm: 6, md: 4 }}>
-              <Card shadow="sm" padding="lg" radius="md" withBorder>
-                {room.images && room.images.length > 0 ? (
-            <img
-            src={`/images/rooms/${room.images[0]}`}
-            alt={room.roomName}
-            style={{ width: "100%", height: "200px", objectFit: "cover" }}
-          />
-                ) : (
-                  <Skeleton height={160} mb="sm" />
-                )}
+            <Grid.Col key={room._id} span={4} style={{ marginBottom: '30px' }}>
+              <Card
+                padding={0}
+                shadow="sm"
+                radius="md"
+                withBorder
+                style={{
+                  transition: 'transform 0.2s',
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  overflow: 'hidden',
+                }}
+              >
+                <Card.Section>
+                  <Box style={{ position: 'relative' }}>
+                    <Badge
+                      style={{
+                        position: 'absolute',
+                        top: '15px',
+                        right: '15px',
+                        backgroundColor: '#f59f00',
+                        color: '#212529',
+                        fontWeight: 700,
+                        padding: '5px 10px',
+                        borderRadius: '4px',
+                        zIndex: 2,
+                        fontSize: '16px',
+                      }}
+                    >
+                      {formatPrice(room.price)}
+                    </Badge>
+                    <Image
+                      src={`/images/rooms/${room.images && room.images.length > 0 ? room.images[0] : 'default.jpg'}`}
+                      height={220}
+                      alt={room.roomName}
+                    />
+                  </Box>
+                </Card.Section>
 
-                <Group position="apart" mb="xs">
-                  <Text fw={500} size="lg">{room.roomName || "Unnamed Room"}</Text>
-                  <Badge color={room.isAvailable ? "green" : "red"}>
-                    {room.isAvailable ? "Available" : "Unavailable"}
-                  </Badge>
-                </Group>
+                <Box style={{
+                  padding: '20px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  flexGrow: 1,
+                }}>
+                  <Title style={{
+                    fontSize: '22px',
+                    fontWeight: 700,
+                    marginBottom: '10px',
+                  }}>
+                    {room.roomName}
+                  </Title>
 
-                <Text c="dimmed" size="sm">
-                  {room.description || "No description available"}
-                </Text>
+                  <Text style={{
+                    fontSize: '14px',
+                    color: '#6c757d',
+                    marginBottom: '10px',
+                    flexGrow: 1,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 3,
+                    WebkitBoxOrient: 'vertical',
+                  }}>
+                    {room.description}
+                  </Text>
 
-                <Text size="sm" mt="xs">
-                  <b>Room:</b> {room.roomNumber || "N/A"} - {room.roomType || "N/A"}
-                </Text>
-
-                <Text size="sm">
-                  <b>Bed:</b> {room.bedType || "N/A"} | <b>View:</b> {room.view || "N/A"}
-                </Text>
-
-                <Text size="sm">
-                  <b>Floor:</b> {room.floor || "N/A"} | <b>Area:</b> {room.area ? `${room.area} m²` : "N/A"}
-                </Text>
-
-                <Text size="sm">
-                  <b>Capacity:</b> {room.capacity ? `${room.capacity} people` : "N/A"}
-                </Text>
-
-                <Text size="sm" mt="xs">
-                  {room.discountPrice > 0 ? (
-                    <>
-                      <Text span c="dimmed" td="line-through">{room.price?.toLocaleString() || 0} VND</Text> {" "}
-                      <Text span color="red">{room.discountPrice?.toLocaleString() || 0} VND</Text>
-                    </>
-                  ) : (
-                    <>Price: {room.price?.toLocaleString() || 0} VND</>
-                  )}
-                </Text>
-
-                <Group position="right" mt="md">
-                  <Button size="xs" variant="default" onClick={() => navigate(`/rooms/edit/${room._id}`)}>
-                    Edit
-                  </Button>
-                  <Button size="xs" color="red" onClick={() => handleDelete(room._id)}>
-                    Delete
-                  </Button>
-                </Group>
+                  <Group position="center" mt="auto" spacing="sm">
+                    <Button color="blue" fullWidth onClick={() => handleUpdate(room._id)}>
+                      Chỉnh sửa
+                    </Button>
+                    <Button color="red" fullWidth onClick={() => handleDeleteConfirm(room._id)}>
+                      Xóa
+                    </Button>
+                  </Group>
+                </Box>
               </Card>
             </Grid.Col>
           ))}
         </Grid>
-      ) : (
-        <Text align="center" color="dimmed" mt="xl">
-          No rooms found.
-        </Text>
       )}
-    </div>
+
+      {/* Modal xác nhận xóa */}
+      <Modal
+        opened={confirmOpened}
+        onClose={close}
+        title="Xác nhận"
+        centered
+      >
+        <Text>Bạn có chắc chắn muốn xóa phòng này không?</Text>
+        <Group position="apart" mt="md">
+          <Button onClick={close} color="gray">Hủy</Button>
+          <Button onClick={handleDelete} color="red">Xóa</Button>
+        </Group>
+      </Modal>
+    </Container>
   );
-};
+}
 
 export default ManageRooms;

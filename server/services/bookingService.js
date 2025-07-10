@@ -2,15 +2,25 @@ import * as bookingRepository from '../repositories/booking.repo.js';
 import * as notiService from './notiService.js';
 
 export const createBooking = async (userId, bookingData) => {
+  // Gán userId vào bookingData
   bookingData.user = userId;
   bookingData.status = 'pending';
   console.log('✅ bookingData gửi vào bookingRepository:', bookingData);
-  const booking = await bookingRepository.createBooking(bookingData);
-  const message = `Đặt phòng của bạn đã được ghi nhận. Hãy đợi nhân viên xác nhận thông tin đặt phòng.`;
-  await notiService.createNotification(userId, message);
 
+  // Tạo booking mới
+  const booking = await bookingRepository.createBooking(bookingData);
+
+  // Gửi notification cho user
+  const message = 'Đặt phòng của bạn đã được ghi nhận. Hãy đợi nhân viên xác nhận thông tin đặt phòng.';
+  // if (!userId) {
+  //   console.error('❌ userId is missing when creating notification');
+  // } else {
+  //   // const message = 'Đặt phòng của bạn đã được ghi nhận...';
+  //   await notiService.createNotification(userId, message);
+  // }
   return booking;
 };
+
 
 export const getBookingsByUserId = async (userId) => {
   return await bookingRepository.findBookingsByUserId(userId);
@@ -46,4 +56,7 @@ export const updateBookingStatus = async (id, status) => {
   }
 
   return booking;
+};
+export const  getHandledBookingsService= async () => {
+  return await bookingRepository.findBookingsByStatus(['confirmed', 'canceled']);
 };

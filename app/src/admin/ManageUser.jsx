@@ -2,12 +2,13 @@ import React, { useState, useEffect } from "react";
 import { Container, Title, Table, Button, Modal, TextInput, Group, Box } from "@mantine/core";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import api from "../axios";
-
+import { AiOutlineRollback } from "react-icons/ai";
+import { useNavigate } from "react-router-dom";
 function ManageUser() {
   const [users, setUsers] = useState([]);
   const [openedEdit, setOpenedEdit] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-
+  const navigate =useNavigate();
   const [formData, setFormData] = useState({
     email: "",
     phone: "",
@@ -53,7 +54,14 @@ function ManageUser() {
       <Group position="apart" mt="md" mb="md">
         <Title order={2}>Quản lý người dùng</Title>
       </Group>
-
+      <Button
+            variant="outline"
+            color="gray"
+            onClick={() => navigate("/admin")}
+            leftIcon={<AiOutlineRollback size={20} />}
+      >
+        Quay về trang Admin
+      </Button>
       <Table striped highlightOnHover withBorder withColumnBorders>
         <thead>
           <tr>

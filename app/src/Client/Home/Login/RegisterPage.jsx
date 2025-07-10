@@ -52,7 +52,8 @@ function RegisterPage() {
       setIsLoading(false);
       return;
     }
-
+    const [day, month, year] = birthDate.split('/');
+    const formattedBirthDate = `${year}-${month}-${day}`;
     try {
       // Gửi yêu cầu đăng ký đến API
       const response = await api.post('users/register', {
@@ -60,7 +61,7 @@ function RegisterPage() {
         phoneNumber,
         address,
         email,
-        birthDate,
+        birthDate:formattedBirthDate,
         password
       });
       
@@ -89,7 +90,7 @@ function RegisterPage() {
 
   // Điều hướng đến trang đăng nhập
   const handleGoToLogin = () => {
-    navigate('/login');
+    navigate('/users');
   };
 
   // Điều hướng về trang chủ

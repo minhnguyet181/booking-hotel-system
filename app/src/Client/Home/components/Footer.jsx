@@ -19,7 +19,8 @@ function Footer() {
               fontWeight: 700,
               marginBottom: '20px',
             }}>H RESORT HOTEL</Title>
-            <Text mb="md">Trải nghiệm kỳ nghỉ sang trọng và đẳng cấp tại khách sạn 5 sao của chúng tôi. Với dịch vụ chuyên nghiệp và tiện nghi hiện đại, chúng tôi cam kết mang đến cho bạn những khoảnh khắc đáng nhớ.</Text>
+            <Text mb="md">Trải nghiệm kỳ nghỉ sang trọng và đẳng cấp tại khách sạn 5 sao của chúng tôi. Với dịch vụ chuyên nghiệp và tiện nghi hiện đại, 
+              chúng tôi cam kết mang đến cho bạn những khoảnh khắc đáng nhớ.</Text>
             <Group spacing="xs">
               <Box component="a" href="#" sx={{ color: 'white', fontSize: '20px' }}>
                 <span>📱</span>
@@ -73,23 +74,8 @@ function Footer() {
               '&:hover': {
                 color: '#ffe066',
               },
-            }}>Ưu đãi</Text>
-            <Text sx={{
-              display: 'block',
-              color: '#adb5bd',
-              marginBottom: '5px',
-              '&:hover': {
-                color: '#ffe066',
-              },
             }}>Giới thiệu</Text>
-            <Text sx={{
-              display: 'block',
-              color: '#adb5bd',
-              marginBottom: '5px',
-              '&:hover': {
-                color: '#ffe066',
-              },
-            }}>Liên hệ</Text>
+
           </Grid.Col>
           <Grid.Col span={3}>
             <Title sx={{

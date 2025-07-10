@@ -4,6 +4,7 @@ export const createBooking = async (req, res) => {
   try {
     const userId = req.user._id; // ✅ Lấy user từ token
     const bookingData = req.body; // ✅ Lấy dữ liệu từ body request
+    console.log('Received body:', req.body);
 
     const booking = await bookingService.createBooking(userId, bookingData); // ✅ Gọi service
     res.status(201).json({ success: true, data: booking }); // ✅ Trả về booking thành công
@@ -61,6 +62,14 @@ export const cancelBooking = async (req, res) => {
   try {
     const booking = await bookingService.updateBookingStatus(req.params.id, 'canceled');
     res.status(200).json({ success: true, data: booking });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+export const getHandledBookings = async (req, res) => {
+  try {
+    const bookings = await bookingService.getHandledBookingsService();
+    res.status(200).json({ success: true, bookings });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
   }

@@ -101,9 +101,8 @@ function BookingPage() {
       totalDays: calculateTotalDays(),
       numberOfGuests: formData.adults + formData.children,
       status: 'pending', 
-      user: formData.fullName
     };
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem('token');
 
     try {
       const res = await api.post('/booking', bookingData,
