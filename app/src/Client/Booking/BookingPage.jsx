@@ -16,6 +16,20 @@ function BookingPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
+  // Kiểm tra authentication khi component mount
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      showNotification({
+        title: 'Yêu cầu đăng nhập',
+        message: 'Vui lòng đăng nhập để đặt phòng.',
+        color: 'yellow',
+      });
+      navigate('/users');
+      return;
+    }
+  }, [navigate]);
+  
   // Form state
   const [formData, setFormData] = useState({
     fullName: '',
@@ -93,16 +107,33 @@ function BookingPage() {
       return;
     }
     
-    // Chuẩn bị dữ liệu để gửi đi
-    const bookingData = {
-      ...formData,
-      room: roomId,
-      totalPrice: calculateTotalPrice(),
-      totalDays: calculateTotalDays(),
-      numberOfGuests: formData.adults + formData.children,
-      status: 'pending', 
-    };
+    // Kiểm tra token trước khi submit
     const token = localStorage.getItem('token');
+    if (!token) {
+      showNotification({
+        title: 'Lỗi',
+        message: 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.',
+        color: 'red',
+      });
+      navigate('/users');
+      return;
+    }
+
+    // Chuẩn bị dữ liệu để gửi đi - chỉ gửi các field cần thiết
+    const bookingData = {
+      room: roomId,
+      checkInDate: formData.checkInDate instanceof Date 
+        ? formData.checkInDate.toISOString() 
+        : new Date(formData.checkInDate).toISOString(),
+      checkOutDate: formData.checkOutDate instanceof Date 
+        ? formData.checkOutDate.toISOString() 
+        : new Date(formData.checkOutDate).toISOString(),
+      numberOfGuests: formData.adults + formData.children,
+      // Các field khác không cần thiết cho booking model nhưng có thể lưu trong bookingData nếu cần
+      fullName: formData.fullName,
+      phone: formData.phone,
+      email: formData.email,
+    };
 
     try {
       const res = await api.post('/booking', bookingData,

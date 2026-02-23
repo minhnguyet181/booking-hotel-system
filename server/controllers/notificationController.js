@@ -2,7 +2,7 @@ import * as notiService from '../services/notiService.js';
 
 export const getMyNotifications = async (req, res) => {
   try {
-    const notifications = await notiService.getNotificationsByUserId(req.user._id);
+    const notifications = await notiService.getNotificationsByUserId(req.user.id);
     res.status(200).json({ success: true, data: notifications });
   } catch (error) {
     console.error('Error getting notifications:', error);

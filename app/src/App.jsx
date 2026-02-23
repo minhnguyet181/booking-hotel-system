@@ -16,6 +16,8 @@ import UserManagePage from "./Client/User/UserManagePage";
 import RegisterPage from './Client/Home/Login/RegisterPage';
 import ManageHandledBooking from './admin/ManageHandledBooking';
 import ManageHotel from './admin/ManageHotel';
+import ProtectedRoute from './components/ProtectedRoute';
+
 function App() {
   return (
     <Router>
@@ -27,15 +29,15 @@ function App() {
         <Route path="/users" element={<LoginPage />} />
         <Route path="/activities" element={<ActivitiesPage />} />
         <Route path="/destinations" element={<DestinationsPage />} />
-        <Route path='/admin' element={<AdminPage/>}  />
-        <Route path='/admin/users' element={<UserManagementPage/>}  />
-        <Route path='/admin/bookings' element={<ManageBooking/>}  />
-        <Route path='/admin/rooms' element={<ManageRooms/>}  />
+        <Route path='/admin' element={<ProtectedRoute requireAdmin={true}><AdminPage/></ProtectedRoute>}  />
+        <Route path='/admin/users' element={<ProtectedRoute requireAdmin={true}><UserManagementPage/></ProtectedRoute>}  />
+        <Route path='/admin/bookings' element={<ProtectedRoute requireAdmin={true}><ManageBooking/></ProtectedRoute>}  />
+        <Route path='/admin/rooms' element={<ProtectedRoute requireAdmin={true}><ManageRooms/></ProtectedRoute>}  />
         <Route path="/notifications" element={<NotificationsPage />} />
         <Route path="/userManage" element={<UserManagePage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path='/admin/bookings/handled' element={<ManageHandledBooking/>}  />
-        <Route path='/admin/hotel-info' element={<ManageHotel/>}  />
+        <Route path='/admin/bookings/handled' element={<ProtectedRoute requireAdmin={true}><ManageHandledBooking/></ProtectedRoute>}  />
+        <Route path='/admin/hotel-info' element={<ProtectedRoute requireAdmin={true}><ManageHotel/></ProtectedRoute>}  />
         {/* Thêm các route khác ở đây */}
       </Routes>
     </Router>

@@ -2,7 +2,7 @@ import * as bookingService from '../services/bookingService.js';
 
 export const createBooking = async (req, res) => {
   try {
-    const userId = req.user._id; // ✅ Lấy user từ token
+    const userId = req.user.id; // ✅ Lấy user từ token (token có id không phải _id)
     const bookingData = req.body; // ✅ Lấy dữ liệu từ body request
     console.log('Received body:', req.body);
 
@@ -16,7 +16,7 @@ export const createBooking = async (req, res) => {
 
 export const getUserBookings = async (req, res) => {
   try {
-    const bookings = await bookingService.getBookingsByUser(req.user._id);
+    const bookings = await bookingService.getBookingsByUserId(req.user.id);
     res.status(200).json({ success: true, data: bookings });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
@@ -42,7 +42,7 @@ export const getAllBookings = async (req, res) => {
 export const getPendingBookings = async (req, res) => {
   try {
     const bookings = await bookingService.getPendingBookings();
-    res.status(200).json({ success: true, data: bookings });
+    res.status(200).json({ success: true, bookings });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
   }

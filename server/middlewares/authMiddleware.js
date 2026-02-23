@@ -15,7 +15,16 @@ export const verifyTokenMiddleware = (req, res, next) => {
 };
 
 export const checkRoleMiddleware = (role) => (req, res, next) => {
-  if (req.user?.role !== role) return res.status(403).json({ message: 'Không có quyền truy cập' });
+  // Kiểm tra xem user đã được verify chưa
+  if (!req.user) {
+    return res.status(401).json({ message: 'Chưa xác thực' });
+  }
+  
+  // Kiểm tra role
+  if (req.user.role !== role) {
+    return res.status(403).json({ message: 'Không có quyền truy cập' });
+  }
+  
   next();
 };
 

@@ -1,10 +1,32 @@
-import React from 'react';
-import { Container, Title, Card, SimpleGrid, Text } from '@mantine/core';
+import React, { useEffect, useState } from 'react';
+import { Container, Title, Card, SimpleGrid, Text, Loader, Alert, Button } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 import { FaUserCog, FaHotel, FaClipboardList, FaBed } from 'react-icons/fa';
 
 function AdminPage() {
   const navigate = useNavigate();
+  const [isAdmin, setIsAdmin] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const checkAdmin = () => {
+      const userData = localStorage.getItem('user');
+      if (userData) {
+        try {
+          const user = JSON.parse(userData);
+          setIsAdmin(user.role === 'admin');
+        } catch (error) {
+          console.error('Error parsing user data:', error);
+          setIsAdmin(false);
+        }
+      } else {
+        setIsAdmin(false);
+      }
+      setLoading(false);
+    };
+
+    checkAdmin();
+  }, []);
 
   const adminFunctions = [
     {
@@ -32,6 +54,25 @@ function AdminPage() {
       link: '/admin/hotel-info',
     },
   ];
+
+  if (loading) {
+    return (
+      <Container style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
+        <Loader size="lg" />
+      </Container>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <Container size="lg" py="xl">
+        <Alert color="red" title="Không có quyền truy cập" mb="md">
+          Bạn cần quyền admin để truy cập trang này.
+        </Alert>
+        <Button onClick={() => navigate('/')}>Về trang chủ</Button>
+      </Container>
+    );
+  }
 
   return (
     <Container size="lg" py="xl">

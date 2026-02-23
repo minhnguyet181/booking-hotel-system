@@ -17,8 +17,14 @@ export const findBookingsByStatus = async (status) => {
   return await Booking.find({ status }).populate('user').populate('room');
 };
 
+export const findBookingsByStatuses = async (statuses) => {
+  return await Booking.find({ status: { $in: statuses } }).populate('user').populate('room');
+};
+
 export const updateBookingStatus = async (id, status) => {
-  const booking = await Booking.findByIdAndUpdate(id, { status }, { new: true });
+  const booking = await Booking.findByIdAndUpdate(id, { status }, { new: true })
+    .populate('user')
+    .populate('room');
   if (!booking) {
     throw new Error('Booking không tồn tại');
   }
