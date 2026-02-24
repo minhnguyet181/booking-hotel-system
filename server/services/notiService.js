@@ -22,6 +22,10 @@ export const getNotificationsByUserId = async (userId) => {
   return await notificationRepository.getNotificationsByUserId(userId);
 };
 
+export const getUnreadCountByUserId = async (userId) => {
+  return await notificationRepository.getUnreadCountByUserId(userId);
+};
+
 export const markNotificationAsRead = async (notificationId) => {
   return await notificationRepository.markNotificationAsRead(notificationId);
 };

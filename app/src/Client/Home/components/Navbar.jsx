@@ -20,26 +20,60 @@ function Navbar() {
     setUser(userData);
     
     if (token) {
-      // Lấy số lượng thông báo chưa đọc
-      api.get('/notifications/unread-count')
-        .then(res => {
-          if (res.data && res.data.success) {
-            setUnreadCount(res.data.count);
-          }
-        })
-        .catch(err => {
-          console.error("❌ Lỗi khi lấy số lượng thông báo:", err);
-        });
+      // Lấy số lượng thông báo chưa đọc lần đầu
+      fetchUnreadCount();
+      
+      // Polling để cập nhật real-time notifications mỗi 30 giây
+      const interval = setInterval(() => {
+        fetchUnreadCount();
+      }, 30000); // 30 giây
+      
+      return () => clearInterval(interval);
     }
   }, []);
 
+  const fetchUnreadCount = () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    
+    api.get('/notifications/unread-count')
+      .then(res => {
+        if (res.data && res.data.success) {
+          setUnreadCount(res.data.count);
+        }
+      })
+      .catch(err => {
+        // Không log error nếu là 401/403 (user đã logout)
+        if (err.response?.status !== 401 && err.response?.status !== 403) {
+          console.error("❌ Lỗi khi lấy số lượng thông báo:", err);
+        }
+      });
+  };
+
   // Hàm xử lý đăng xuất
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setIsLoggedIn(false);
-    setUser(null);
-    navigate('/');
+  const handleLogout = async () => {
+    try {
+      // Gọi API logout để invalidate token (nếu có)
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          await api.post('/users/logout');
+        } catch (err) {
+          // Nếu API logout fail, vẫn tiếp tục logout ở client
+          console.error('Logout API error:', err);
+        }
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      // Xóa token và user data ở client
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      setIsLoggedIn(false);
+      setUser(null);
+      setUnreadCount(0);
+      navigate('/');
+    }
   };
 
   return (
@@ -76,7 +110,29 @@ function Navbar() {
                 </Button>
               ) : (
                 <Group spacing="xs">
-                  <ActionIcon color="white" variant="transparent" onClick={() => navigate('/userManage')}>
+                  {user?.role === 'admin' && (
+                    <Button 
+                      variant="subtle" 
+                      color="yellow"
+                      onClick={() => navigate('/admin')}
+                      sx={{ color: 'white', '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.1)' } }}
+                    >
+                      Admin
+                    </Button>
+                  )}
+                  <ActionIcon 
+                    color="white" 
+                    variant="transparent" 
+                    onClick={() => navigate('/userManage')}
+                    title="Quản lý tài khoản"
+                    sx={{
+                      '&:hover': {
+                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                        transform: 'scale(1.1)',
+                      },
+                      transition: 'all 0.2s',
+                    }}
+                  >
                     <FaUserFriends size={20} />
                   </ActionIcon>
                   <Box sx={{ position: 'relative' }}>
@@ -84,6 +140,7 @@ function Navbar() {
                       color="white" 
                       variant="transparent" 
                       onClick={() => navigate('/notifications')}
+                      title="Thông báo"
                       sx={{
                         '&:hover': {
                           backgroundColor: 'rgba(255, 255, 255, 0.1)',
@@ -102,15 +159,32 @@ function Navbar() {
                           right: -5,
                           backgroundColor: '#f59f00',
                           color: '#212529',
+                          animation: unreadCount > 0 ? 'pulse 2s infinite' : 'none',
+                          '@keyframes pulse': {
+                            '0%, 100%': { opacity: 1 },
+                            '50%': { opacity: 0.7 },
+                          },
                         }} 
                         size="xs" 
                         variant="filled"
                       >
-                        {unreadCount}
+                        {unreadCount > 99 ? '99+' : unreadCount}
                       </Badge>
                     )}
                   </Box>
-                  <ActionIcon color="white" variant="transparent" onClick={handleLogout}>
+                  <ActionIcon 
+                    color="white" 
+                    variant="transparent" 
+                    onClick={handleLogout}
+                    title="Đăng xuất"
+                    sx={{
+                      '&:hover': {
+                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                        transform: 'scale(1.1)',
+                      },
+                      transition: 'all 0.2s',
+                    }}
+                  >
                     <FaSignOutAlt size={20} />
                   </ActionIcon>
                 </Group>

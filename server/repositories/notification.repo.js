@@ -14,6 +14,10 @@ export const getNotificationsByUserId = async (userId) => {
   return await Notification.find({ user: userId }).sort({ createdAt: -1 });
 };
 
+export const getUnreadCountByUserId = async (userId) => {
+  return await Notification.countDocuments({ user: userId, isRead: false });
+};
+
 export const markNotificationAsRead = async (notificationId) => {
   return await Notification.findByIdAndUpdate(
     notificationId,

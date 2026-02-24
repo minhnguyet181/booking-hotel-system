@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Title, Text, Grid, Card, Group, Badge, Image, Box, Loader, Button, Modal } from '@mantine/core';
+import { 
+  Container, Title, Text, Grid, Card, Group, Badge, Image, Box, Loader, 
+  Button, Modal, TextInput, NumberInput, Select, Textarea, MultiSelect, 
+  Switch, Alert, Stack
+} from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import api from '../axios';
 import { useNavigate } from 'react-router-dom';
@@ -9,7 +13,13 @@ function ManageRooms() {
   const [loading, setLoading] = useState(true);
   const [deleteRoomId, setDeleteRoomId] = useState(null);
   const [confirmOpened, { open, close }] = useDisclosure(false);
-  const navigate =useNavigate();
+  const [editOpened, { open: openEdit, close: closeEdit }] = useDisclosure(false);
+  const [addOpened, { open: openAdd, close: closeAdd }] = useDisclosure(false);
+  const [selectedRoom, setSelectedRoom] = useState(null);
+  const [formData, setFormData] = useState({});
+  const [notification, setNotification] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const navigate = useNavigate();
   useEffect(() => {
     fetchRooms();
   }, []);
@@ -35,8 +45,85 @@ function ManageRooms() {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
   };
 
-  const handleUpdate = (roomId) => {
-    alert(`👉 Chuyển đến trang cập nhật phòng với ID: ${roomId}`);
+  const handleUpdate = async (roomId) => {
+    try {
+      const res = await api.get(`/rooms/${roomId}`);
+      if (res.data && res.data.success) {
+        const room = res.data.data;
+        setSelectedRoom(room);
+        setFormData({
+          roomNumber: room.roomNumber || '',
+          roomName: room.roomName || '',
+          description: room.description || '',
+          price: room.price || 0,
+          discountPrice: room.discountPrice || 0,
+          capacity: room.capacity || 1,
+          roomType: room.roomType || 'Tiêu chuẩn',
+          bedType: room.bedType || 'Đơn',
+          view: room.view || 'Không',
+          floor: room.floor || 1,
+          area: room.area || 0,
+          isAvailable: room.isAvailable !== undefined ? room.isAvailable : true,
+          amenities: room.amenities || [],
+          rating: room.rating || 0,
+        });
+        openEdit();
+      }
+    } catch (error) {
+      console.error('Error fetching room:', error);
+      setNotification({ type: 'error', message: 'Không thể tải thông tin phòng' });
+      setTimeout(() => setNotification(null), 3000);
+    }
+  };
+
+  const handleSaveRoom = async () => {
+    try {
+      setSaving(true);
+      if (selectedRoom && selectedRoom._id) {
+        // Update existing room
+        await api.put(`/rooms/${selectedRoom._id}`, formData);
+        setNotification({ type: 'success', message: 'Cập nhật phòng thành công!' });
+        closeEdit();
+      } else {
+        // Create new room
+        await api.post(`/rooms`, formData);
+        setNotification({ type: 'success', message: 'Tạo phòng mới thành công!' });
+        closeAdd();
+        setFormData({});
+      }
+      fetchRooms();
+      setTimeout(() => setNotification(null), 3000);
+    } catch (error) {
+      console.error('Error saving room:', error);
+      setNotification({ 
+        type: 'error', 
+        message: error.response?.data?.message || 'Lỗi khi lưu phòng' 
+      });
+      setTimeout(() => setNotification(null), 3000);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleAddRoom = () => {
+    setSelectedRoom(null);
+    setFormData({
+      roomNumber: '',
+      roomName: '',
+      description: '',
+      price: 0,
+      discountPrice: 0,
+      capacity: 1,
+      roomType: 'Tiêu chuẩn',
+      bedType: 'Đơn',
+      view: 'Không',
+      floor: 1,
+      area: 0,
+      isAvailable: true,
+      amenities: [],
+      rating: 0,
+    });
+    openAdd();
   };
 
   const handleDeleteConfirm = (roomId) => {
@@ -50,14 +137,21 @@ function ManageRooms() {
     api.delete(`/rooms/${deleteRoomId}`)
       .then(res => {
         if (res.data && res.data.success) {
-          // Xóa thành công, load lại danh sách
+          setNotification({ type: 'success', message: 'Xóa phòng thành công!' });
           fetchRooms();
+          setTimeout(() => setNotification(null), 3000);
         } else {
-          console.error('❌ Không thể xóa phòng');
+          setNotification({ type: 'error', message: 'Không thể xóa phòng' });
+          setTimeout(() => setNotification(null), 3000);
         }
       })
       .catch(err => {
         console.error('❌ Lỗi xóa phòng:', err);
+        setNotification({ 
+          type: 'error', 
+          message: err.response?.data?.message || 'Lỗi khi xóa phòng' 
+        });
+        setTimeout(() => setNotification(null), 3000);
       })
       .finally(() => {
         setDeleteRoomId(null);
@@ -65,19 +159,47 @@ function ManageRooms() {
       });
   };
 
+  const commonAmenities = [
+    'WiFi miễn phí', 'Điều hòa', 'TV', 'Minibar', 'Bồn tắm', 
+    'Vòi sen', 'Ban công', 'Tủ lạnh', 'Máy pha cà phê', 
+    'Bàn làm việc', 'Két an toàn', 'Dịch vụ phòng', 'Thang máy'
+  ];
+
   return (
     <Container size="xl" style={{ marginTop: '80px', marginBottom: '80px' }}>
-      <Title align="center" style={{ fontSize: '36px', fontWeight: 700, marginBottom: '40px' }}>
-        Quản lý danh sách phòng
-      </Title>
-      <Button
+      {notification && (
+        <Alert 
+          color={notification.type === 'success' ? 'green' : 'red'} 
+          title={notification.type === 'success' ? 'Thành công' : 'Lỗi'}
+          mb="md"
+          onClose={() => setNotification(null)}
+          withCloseButton
+        >
+          {notification.message}
+        </Alert>
+      )}
+
+      <Group position="apart" mb="md">
+        <Title style={{ fontSize: '36px', fontWeight: 700 }}>
+          Quản lý danh sách phòng
+        </Title>
+        <Group>
+          <Button
             variant="outline"
             color="gray"
             onClick={() => navigate("/admin")}
             leftIcon={<AiOutlineRollback size={20} />}
-      >
-        Quay về trang Admin
-      </Button>
+          >
+            Quay về trang Admin
+          </Button>
+          <Button
+            color="blue"
+            onClick={handleAddRoom}
+          >
+            + Thêm phòng mới
+          </Button>
+        </Group>
+      </Group>
       {loading ? (
         <Box style={{ display: 'flex', justifyContent: 'center', padding: '50px 0' }}>
           <Loader size="xl" color="#f59f00" />
@@ -172,14 +294,311 @@ function ManageRooms() {
       <Modal
         opened={confirmOpened}
         onClose={close}
-        title="Xác nhận"
+        title="Xác nhận xóa phòng"
         centered
+        size="md"
       >
-        <Text>Bạn có chắc chắn muốn xóa phòng này không?</Text>
-        <Group position="apart" mt="md">
-          <Button onClick={close} color="gray">Hủy</Button>
+        <Text mb="md">Bạn có chắc chắn muốn xóa phòng này không? Hành động này không thể hoàn tác.</Text>
+        <Group position="right" mt="md">
+          <Button onClick={close} color="gray" variant="outline">Hủy</Button>
           <Button onClick={handleDelete} color="red">Xóa</Button>
         </Group>
+      </Modal>
+
+      {/* Modal thêm phòng mới */}
+      <Modal
+        opened={addOpened}
+        onClose={closeAdd}
+        title="Thêm phòng mới"
+        centered
+        size="xl"
+      >
+        <Stack spacing="md">
+          <Grid>
+            <Grid.Col span={6}>
+              <TextInput
+                label="Số phòng"
+                value={formData.roomNumber || ''}
+                onChange={(e) => setFormData({ ...formData, roomNumber: e.target.value })}
+                required
+              />
+            </Grid.Col>
+            <Grid.Col span={6}>
+              <TextInput
+                label="Tên phòng"
+                value={formData.roomName || ''}
+                onChange={(e) => setFormData({ ...formData, roomName: e.target.value })}
+                required
+              />
+            </Grid.Col>
+            <Grid.Col span={12}>
+              <Textarea
+                label="Mô tả"
+                value={formData.description || ''}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                required
+                minRows={3}
+              />
+            </Grid.Col>
+            <Grid.Col span={4}>
+              <NumberInput
+                label="Giá (VND)"
+                value={formData.price || 0}
+                onChange={(value) => setFormData({ ...formData, price: value || 0 })}
+                required
+                min={0}
+                step={10000}
+              />
+            </Grid.Col>
+            <Grid.Col span={4}>
+              <NumberInput
+                label="Giá giảm (VND)"
+                value={formData.discountPrice || 0}
+                onChange={(value) => setFormData({ ...formData, discountPrice: value || 0 })}
+                min={0}
+                step={10000}
+              />
+            </Grid.Col>
+            <Grid.Col span={4}>
+              <NumberInput
+                label="Sức chứa"
+                value={formData.capacity || 1}
+                onChange={(value) => setFormData({ ...formData, capacity: value || 1 })}
+                required
+                min={1}
+              />
+            </Grid.Col>
+            <Grid.Col span={4}>
+              <Select
+                label="Loại phòng"
+                value={formData.roomType || 'Tiêu chuẩn'}
+                onChange={(value) => setFormData({ ...formData, roomType: value })}
+                data={['Tiêu chuẩn', 'Deluxe', 'Suite', 'Gia đình', 'VIP']}
+                required
+              />
+            </Grid.Col>
+            <Grid.Col span={4}>
+              <Select
+                label="Loại giường"
+                value={formData.bedType || 'Đơn'}
+                onChange={(value) => setFormData({ ...formData, bedType: value })}
+                data={['Đơn', 'Đôi', 'Queen', 'King', 'Twin']}
+                required
+              />
+            </Grid.Col>
+            <Grid.Col span={4}>
+              <Select
+                label="View"
+                value={formData.view || 'Không'}
+                onChange={(value) => setFormData({ ...formData, view: value })}
+                data={['Biển', 'Thành phố', 'Núi', 'Vườn', 'Hồ bơi', 'Không']}
+              />
+            </Grid.Col>
+            <Grid.Col span={4}>
+              <NumberInput
+                label="Tầng"
+                value={formData.floor || 1}
+                onChange={(value) => setFormData({ ...formData, floor: value || 1 })}
+                required
+                min={1}
+              />
+            </Grid.Col>
+            <Grid.Col span={4}>
+              <NumberInput
+                label="Diện tích (m²)"
+                value={formData.area || 0}
+                onChange={(value) => setFormData({ ...formData, area: value || 0 })}
+                required
+                min={0}
+              />
+            </Grid.Col>
+            <Grid.Col span={4}>
+              <NumberInput
+                label="Đánh giá (0-5)"
+                value={formData.rating || 0}
+                onChange={(value) => setFormData({ ...formData, rating: value || 0 })}
+                min={0}
+                max={5}
+                step={0.1}
+                precision={1}
+              />
+            </Grid.Col>
+            <Grid.Col span={12}>
+              <MultiSelect
+                label="Tiện ích"
+                data={commonAmenities}
+                value={formData.amenities || []}
+                onChange={(value) => setFormData({ ...formData, amenities: value })}
+                placeholder="Chọn các tiện ích"
+                searchable
+              />
+            </Grid.Col>
+            <Grid.Col span={12}>
+              <Switch
+                label="Phòng có sẵn"
+                checked={formData.isAvailable !== undefined ? formData.isAvailable : true}
+                onChange={(e) => setFormData({ ...formData, isAvailable: e.currentTarget.checked })}
+              />
+            </Grid.Col>
+          </Grid>
+          <Group position="right" mt="md">
+            <Button onClick={closeAdd} color="gray" variant="outline">Hủy</Button>
+            <Button onClick={handleSaveRoom} color="blue" loading={saving}>
+              Tạo phòng
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
+
+      {/* Modal chỉnh sửa phòng */}
+      <Modal
+        opened={editOpened}
+        onClose={closeEdit}
+        title="Chỉnh sửa thông tin phòng"
+        centered
+        size="xl"
+      >
+        <Stack spacing="md">
+          <Grid>
+            <Grid.Col span={6}>
+              <TextInput
+                label="Số phòng"
+                value={formData.roomNumber || ''}
+                onChange={(e) => setFormData({ ...formData, roomNumber: e.target.value })}
+                required
+              />
+            </Grid.Col>
+            <Grid.Col span={6}>
+              <TextInput
+                label="Tên phòng"
+                value={formData.roomName || ''}
+                onChange={(e) => setFormData({ ...formData, roomName: e.target.value })}
+                required
+              />
+            </Grid.Col>
+            <Grid.Col span={12}>
+              <Textarea
+                label="Mô tả"
+                value={formData.description || ''}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                required
+                minRows={3}
+              />
+            </Grid.Col>
+            <Grid.Col span={4}>
+              <NumberInput
+                label="Giá (VND)"
+                value={formData.price || 0}
+                onChange={(value) => setFormData({ ...formData, price: value || 0 })}
+                required
+                min={0}
+                step={10000}
+                parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
+                formatter={(value) =>
+                  !Number.isNaN(parseFloat(value))
+                    ? `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                    : ''
+                }
+              />
+            </Grid.Col>
+            <Grid.Col span={4}>
+              <NumberInput
+                label="Giá giảm (VND)"
+                value={formData.discountPrice || 0}
+                onChange={(value) => setFormData({ ...formData, discountPrice: value || 0 })}
+                min={0}
+                step={10000}
+              />
+            </Grid.Col>
+            <Grid.Col span={4}>
+              <NumberInput
+                label="Sức chứa"
+                value={formData.capacity || 1}
+                onChange={(value) => setFormData({ ...formData, capacity: value || 1 })}
+                required
+                min={1}
+              />
+            </Grid.Col>
+            <Grid.Col span={4}>
+              <Select
+                label="Loại phòng"
+                value={formData.roomType || 'Tiêu chuẩn'}
+                onChange={(value) => setFormData({ ...formData, roomType: value })}
+                data={['Tiêu chuẩn', 'Deluxe', 'Suite', 'Gia đình', 'VIP']}
+                required
+              />
+            </Grid.Col>
+            <Grid.Col span={4}>
+              <Select
+                label="Loại giường"
+                value={formData.bedType || 'Đơn'}
+                onChange={(value) => setFormData({ ...formData, bedType: value })}
+                data={['Đơn', 'Đôi', 'Queen', 'King', 'Twin']}
+                required
+              />
+            </Grid.Col>
+            <Grid.Col span={4}>
+              <Select
+                label="View"
+                value={formData.view || 'Không'}
+                onChange={(value) => setFormData({ ...formData, view: value })}
+                data={['Biển', 'Thành phố', 'Núi', 'Vườn', 'Hồ bơi', 'Không']}
+              />
+            </Grid.Col>
+            <Grid.Col span={4}>
+              <NumberInput
+                label="Tầng"
+                value={formData.floor || 1}
+                onChange={(value) => setFormData({ ...formData, floor: value || 1 })}
+                required
+                min={1}
+              />
+            </Grid.Col>
+            <Grid.Col span={4}>
+              <NumberInput
+                label="Diện tích (m²)"
+                value={formData.area || 0}
+                onChange={(value) => setFormData({ ...formData, area: value || 0 })}
+                required
+                min={0}
+              />
+            </Grid.Col>
+            <Grid.Col span={4}>
+              <NumberInput
+                label="Đánh giá (0-5)"
+                value={formData.rating || 0}
+                onChange={(value) => setFormData({ ...formData, rating: value || 0 })}
+                min={0}
+                max={5}
+                step={0.1}
+                precision={1}
+              />
+            </Grid.Col>
+            <Grid.Col span={12}>
+              <MultiSelect
+                label="Tiện ích"
+                data={commonAmenities}
+                value={formData.amenities || []}
+                onChange={(value) => setFormData({ ...formData, amenities: value })}
+                placeholder="Chọn các tiện ích"
+                searchable
+              />
+            </Grid.Col>
+            <Grid.Col span={12}>
+              <Switch
+                label="Phòng có sẵn"
+                checked={formData.isAvailable !== undefined ? formData.isAvailable : true}
+                onChange={(e) => setFormData({ ...formData, isAvailable: e.currentTarget.checked })}
+              />
+            </Grid.Col>
+          </Grid>
+          <Group position="right" mt="md">
+            <Button onClick={closeEdit} color="gray" variant="outline">Hủy</Button>
+            <Button onClick={handleSaveRoom} color="blue" loading={saving}>
+              Lưu thay đổi
+            </Button>
+          </Group>
+        </Stack>
       </Modal>
     </Container>
   );

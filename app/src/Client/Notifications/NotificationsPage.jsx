@@ -38,7 +38,7 @@ function NotificationsPage() {
 
   // Hàm đánh dấu thông báo đã đọc
   const handleMarkAsRead = (notificationId) => {
-    api.put(`/notifications/mark-as-read/${notificationId}`)  // Đã loại bỏ tiền tố /api
+    api.put(`/notifications/${notificationId}/read`)
       .then(res => {
         if (res.data && res.data.success) {
           // Cập nhật trạng thái thông báo trong state

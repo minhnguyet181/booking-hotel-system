@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { Container, Title, Table, Group, Button, Loader, Text, Alert } from "@mantine/core";
+import { Container, Title, Table, Group, Button, Loader, Text, Alert, TextInput, Badge, Select } from "@mantine/core";
 import { useNavigate } from "react-router-dom";
 import api from "../axios"; 
 import { AiOutlineRollback } from "react-icons/ai";
+import { FaSearch } from "react-icons/fa";
 
 function ManageHandledBooking() {
   const [bookings, setBookings] = useState([]);
+  const [filteredBookings, setFilteredBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
   const navigate = useNavigate();
 
   const fetchHandledBookings = async () => {
@@ -16,7 +20,9 @@ function ManageHandledBooking() {
       setError(null);
       const res = await api.get("/booking/handled"); 
       if (res.data && res.data.success) {
-        setBookings(res.data.bookings || []);
+        const bookingsList = res.data.bookings || [];
+        setBookings(bookingsList);
+        setFilteredBookings(bookingsList);
       } else {
         setError("Không thể tải danh sách booking đã xử lý");
       }
@@ -31,6 +37,39 @@ function ManageHandledBooking() {
   useEffect(() => {
     fetchHandledBookings();
   }, []);
+
+  useEffect(() => {
+    let filtered = bookings;
+
+    // Filter by search term
+    if (searchTerm) {
+      filtered = filtered.filter(booking => 
+        booking.user?.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        booking.user?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        booking.room?.roomName?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Filter by status
+    if (statusFilter !== "all") {
+      filtered = filtered.filter(booking => booking.status === statusFilter);
+    }
+
+    setFilteredBookings(filtered);
+  }, [searchTerm, statusFilter, bookings]);
+
+  const calculateTotalPrice = (booking) => {
+    if (!booking.checkInDate || !booking.checkOutDate || !booking.room?.price) return 0;
+    const checkIn = new Date(booking.checkInDate);
+    const checkOut = new Date(booking.checkOutDate);
+    const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+    const price = booking.room.discountPrice > 0 ? booking.room.discountPrice : booking.room.price;
+    return nights * price;
+  };
+
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+  };
 
   if (loading) {
     return (
@@ -49,7 +88,7 @@ function ManageHandledBooking() {
           <Button variant="outline" onClick={() => navigate("/admin/bookings")}>
             Đơn Pending
           </Button>
-          <Button variant="outline" onClick={() => navigate("/admin/bookings/handled")}>
+          <Button variant="filled" color="blue" onClick={() => navigate("/admin/bookings/handled")}>
             Đơn Đã Xử Lý
           </Button>
         </Group>
@@ -65,6 +104,31 @@ function ManageHandledBooking() {
         Quay về trang Admin
       </Button>
 
+      {/* Search and Filter */}
+      <Group mb="md" spacing="md">
+        <TextInput
+          placeholder="Tìm kiếm theo tên, email, tên phòng..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          icon={<FaSearch size={16} />}
+          style={{ flex: 1 }}
+        />
+        <Select
+          placeholder="Lọc theo trạng thái"
+          value={statusFilter}
+          onChange={setStatusFilter}
+          data={[
+            { value: 'all', label: 'Tất cả' },
+            { value: 'confirmed', label: 'Đã xác nhận' },
+            { value: 'canceled', label: 'Đã hủy' }
+          ]}
+          style={{ width: 200 }}
+        />
+        <Text size="sm" color="dimmed">
+          Tổng: {filteredBookings.length} đơn
+        </Text>
+      </Group>
+
       {error && (
         <Alert color="red" title="Lỗi" mb="md">
           {error}
@@ -72,9 +136,11 @@ function ManageHandledBooking() {
       )}
 
       {/* Bảng dữ liệu */}
-      {bookings.length === 0 ? (
-        <Text align="center" size="lg" color="dimmed" mt="xl">
-          Không có booking đã xử lý nào
+      {filteredBookings.length === 0 ? (
+        <Text align="center" size="lg" color="dimmed" mt="xl" py="xl">
+          {searchTerm || statusFilter !== 'all' 
+            ? 'Không tìm thấy booking nào phù hợp' 
+            : 'Không có booking đã xử lý nào'}
         </Text>
       ) : (
         <Table striped highlightOnHover withBorder withColumnBorders>
@@ -85,23 +151,34 @@ function ManageHandledBooking() {
               <th>Phòng</th>
               <th>Ngày check-in</th>
               <th>Ngày check-out</th>
+              <th>Số khách</th>
+              <th>Tổng tiền</th>
               <th>Ngày đặt</th>
               <th>Trạng thái</th>
             </tr>
           </thead>
           <tbody>
-            {bookings.map((booking) => (
+            {filteredBookings.map((booking) => (
               <tr key={booking._id}>
                 <td>{booking.user?.fullName || 'N/A'}</td>
                 <td>{booking.user?.email || 'N/A'}</td>
                 <td>{booking.room?.roomName || 'N/A'}</td>
                 <td>{booking.checkInDate ? new Date(booking.checkInDate).toLocaleDateString('vi-VN') : 'N/A'}</td>
                 <td>{booking.checkOutDate ? new Date(booking.checkOutDate).toLocaleDateString('vi-VN') : 'N/A'}</td>
+                <td>{booking.numberOfGuests || 'N/A'}</td>
+                <td>
+                  <Text weight={500} color="blue">
+                    {formatPrice(calculateTotalPrice(booking))}
+                  </Text>
+                </td>
                 <td>{booking.createdAt ? new Date(booking.createdAt).toLocaleDateString('vi-VN') : 'N/A'}</td>
                 <td>
-                  <Text weight={500} color={booking.status === 'confirmed' ? 'green' : 'red'}>
+                  <Badge 
+                    color={booking.status === 'confirmed' ? 'green' : 'red'}
+                    variant="light"
+                  >
                     {booking.status === "confirmed" ? "Đã xác nhận" : "Đã hủy"}
-                  </Text>
+                  </Badge>
                 </td>
               </tr>
             ))}

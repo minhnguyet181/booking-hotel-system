@@ -10,6 +10,16 @@ export const getMyNotifications = async (req, res) => {
   }
 };
 
+export const getUnreadCount = async (req, res) => {
+  try {
+    const count = await notiService.getUnreadCountByUserId(req.user.id);
+    res.status(200).json({ success: true, count });
+  } catch (error) {
+    console.error('Error getting unread count:', error);
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
 export const markAsRead = async (req, res) => {
   try {
     const notification = await notiService.markNotificationAsRead(req.params.id);

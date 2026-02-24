@@ -1,11 +1,12 @@
 import express from 'express';
-import { registerUser, getAllUsers, loginUser, updateUserByAdmin, updateUser, deleteUser } from '../controllers/userController.js';
+import { registerUser, getAllUsers, loginUser, updateUserByAdmin, updateUser, deleteUser, logoutUser } from '../controllers/userController.js';
 import { verifyTokenMiddleware, checkRoleMiddleware } from '../middlewares/authMiddleware.js';
 
 const userRouter = express.Router();
 
 userRouter.post('/register', registerUser);
 userRouter.post('/login', loginUser);
+userRouter.post('/logout', verifyTokenMiddleware, logoutUser);
 
 userRouter.put('/profile', verifyTokenMiddleware, updateUser);
 

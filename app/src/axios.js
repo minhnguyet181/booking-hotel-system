@@ -24,7 +24,16 @@ api.interceptors.response.use(
   (error) => {
     if (error.response && (error.response.status === 401 || error.response.status === 403)) {
       // Token hết hạn hoặc không hợp lệ, đăng xuất người dùng
-      window.location.href = '/'; // Chuyển hướng đến trang đăng nhập
+      const currentPath = window.location.pathname;
+      // Chỉ redirect nếu không phải đang ở trang login hoặc register
+      if (currentPath !== '/users' && currentPath !== '/register') {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        // Chỉ redirect nếu không phải đang ở trang admin (để tránh loop)
+        if (!currentPath.startsWith('/admin')) {
+          window.location.href = '/users';
+        }
+      }
     }
     return Promise.reject(error);
   }
