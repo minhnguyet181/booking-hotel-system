@@ -13,7 +13,7 @@ export const createBooking = async (userId, bookingData) => {
   // Gửi notification cho user (wrap trong try-catch để không làm lỗi booking process)
   if (userId) {
     try {
-      const message = 'Đặt phòng của bạn đã được ghi nhận. Hãy đợi nhân viên xác nhận thông tin đặt phòng.';
+      const message = '📋 Đặt phòng của bạn đã được ghi nhận. Trạng thái: Đang chờ xác nhận. Hãy đợi nhân viên xác nhận thông tin đặt phòng.';
       await notiService.createNotification(userId, message);
     } catch (error) {
       console.error('❌ Lỗi khi tạo notification:', error);
@@ -49,11 +49,15 @@ export const updateBookingStatus = async (id, status) => {
     try {
       let message = '';
       if (status === 'confirmed') {
-        message = 'Đặt phòng của bạn đã được xác nhận thành công!';
+        message = '✅ Đặt phòng của bạn đã được xác nhận thành công! Vui lòng chuẩn bị thông tin check-in.';
       } else if (status === 'canceled') {
-        message = 'Đặt phòng của bạn đã bị từ chối!';
+        message = '❌ Đặt phòng của bạn đã bị từ chối. Vui lòng liên hệ với chúng tôi nếu có thắc mắc.';
+      } else if (status === 'checked-in') {
+        message = '🏨 Bạn đã check-in thành công! Chúc bạn có một kỳ nghỉ tuyệt vời!';
+      } else if (status === 'checked-out') {
+        message = '👋 Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi! Hẹn gặp lại!';
       } else {
-        message = `Trạng thái đặt phòng của bạn đã thay đổi thành ${status}`;
+        message = `ℹ️ Trạng thái đặt phòng của bạn đã thay đổi thành: ${status}`;
       }
 
       // Lấy userId từ booking.user (có thể là ObjectId hoặc populated object)

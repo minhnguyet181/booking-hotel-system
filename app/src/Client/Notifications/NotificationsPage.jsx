@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from '../Home/components/Navbar';
 import Footer from '../Home/components/Footer';
 import api from '../../axios';
+import { initializeSocket, getSocket } from '../../utils/socket';
 
 function NotificationsPage() {
   const navigate = useNavigate();
@@ -20,20 +21,42 @@ function NotificationsPage() {
     }
 
     // Lấy thông báo của người dùng
-    api.get('/notifications/my-notifications')  // Đã loại bỏ tiền tố /api
-      .then(res => {
-        if (res.data && res.data.success) {
-          setNotifications(res.data.data || []);
-        } else {
-          setError('Không thể lấy thông báo');
-        }
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error("❌ Lỗi khi lấy thông báo:", err);
-        setError('Đã xảy ra lỗi khi tải thông báo');
-        setLoading(false);
+    const fetchNotifications = () => {
+      api.get('/notifications/my-notifications')
+        .then(res => {
+          if (res.data && res.data.success) {
+            setNotifications(res.data.data || []);
+          } else {
+            setError('Không thể lấy thông báo');
+          }
+          setLoading(false);
+        })
+        .catch(err => {
+          console.error("❌ Lỗi khi lấy thông báo:", err);
+          setError('Đã xảy ra lỗi khi tải thông báo');
+          setLoading(false);
+        });
+    };
+
+    fetchNotifications();
+
+    // Khởi tạo Socket.io để nhận thông báo real-time
+    const socket = initializeSocket();
+    
+    if (socket) {
+      // Lắng nghe thông báo mới
+      socket.on('new-notification', (notification) => {
+        console.log('📨 Nhận được thông báo mới:', notification);
+        // Thêm thông báo mới vào đầu danh sách
+        setNotifications(prev => [notification, ...prev]);
       });
+    }
+
+    return () => {
+      if (socket) {
+        socket.off('new-notification');
+      }
+    };
   }, [navigate]);
 
   // Hàm đánh dấu thông báo đã đọc

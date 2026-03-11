@@ -4,6 +4,7 @@ import { Box, Container, Group, Text, Title, Button, ActionIcon, Badge } from '@
 import { FaBell, FaSignOutAlt, FaUserFriends } from 'react-icons/fa';
 import { useState, useEffect } from 'react';
 import api from '../../../axios';
+import { initializeSocket, disconnectSocket, getSocket } from '../../../utils/socket';
 
 function Navbar() {
   const navigate = useNavigate();
@@ -23,12 +24,34 @@ function Navbar() {
       // Lấy số lượng thông báo chưa đọc lần đầu
       fetchUnreadCount();
       
-      // Polling để cập nhật real-time notifications mỗi 30 giây
+      // Khởi tạo Socket.io cho real-time notifications
+      const socket = initializeSocket();
+      
+      if (socket) {
+        // Lắng nghe thông báo mới từ server
+        socket.on('new-notification', (notification) => {
+          console.log('📨 Nhận được thông báo mới:', notification);
+          // Cập nhật số lượng thông báo chưa đọc
+          fetchUnreadCount();
+          
+          // Có thể hiển thị toast notification ở đây nếu cần
+        });
+      }
+      
+      // Fallback: Polling để cập nhật real-time notifications mỗi 60 giây (nếu socket fail)
       const interval = setInterval(() => {
         fetchUnreadCount();
-      }, 30000); // 30 giây
+      }, 60000); // 60 giây
       
-      return () => clearInterval(interval);
+      return () => {
+        clearInterval(interval);
+        if (socket) {
+          socket.off('new-notification');
+        }
+      };
+    } else {
+      // Disconnect socket nếu không có token
+      disconnectSocket();
     }
   }, []);
 
@@ -53,6 +76,9 @@ function Navbar() {
   // Hàm xử lý đăng xuất
   const handleLogout = async () => {
     try {
+      // Disconnect socket trước
+      disconnectSocket();
+      
       // Gọi API logout để invalidate token (nếu có)
       const token = localStorage.getItem('token');
       if (token) {

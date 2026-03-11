@@ -29,6 +29,16 @@ api.interceptors.response.use(
       if (currentPath !== '/users' && currentPath !== '/register') {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
+        
+        // Disconnect socket nếu có (dynamic import để tránh circular dependency)
+        import('./utils/socket.js').then((socketModule) => {
+          if (socketModule.disconnectSocket) {
+            socketModule.disconnectSocket();
+          }
+        }).catch(() => {
+          // Ignore if socket utils not loaded
+        });
+        
         // Chỉ redirect nếu không phải đang ở trang admin (để tránh loop)
         if (!currentPath.startsWith('/admin')) {
           window.location.href = '/users';
